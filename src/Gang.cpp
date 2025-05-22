@@ -36,3 +36,15 @@ void Gang::run() {
     startOperation();
     leaveJail();
 }
+
+int Gang::getID() const {
+    return ID;
+}
+
+int Gang::getCapacity() const {
+    return capacity;
+}
+
+int Gang::getAcceptanceRate() const {
+    return acceptance_rate;
+}

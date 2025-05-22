@@ -12,6 +12,9 @@ public:
   Gang(int ID, int capacity, int acceptacne_rate);
   Gang() = delete;
 
+  int getID() const;
+  int getCapacity() const;
+  int getAcceptanceRate() const;
   void acceptMember(GangMember GangMember);
   void startOperation();
   void leaveJail();

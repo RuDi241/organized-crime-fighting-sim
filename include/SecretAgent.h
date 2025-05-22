@@ -1,7 +1,6 @@
 #ifndef SECRET_AGENT_H
 #define SECRET_AGENT_H
 
-#include <string>
 #include "GangMember.h"
 
 class SecretAgent : public GangMember {
