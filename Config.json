@@ -1,0 +1,45 @@
+{
+  "gang": {
+    "num_gangs_min": 1,
+    "num_gangs_max": 4,
+    "num_members_min": 5,
+    "num_members_max": 10,
+    "num_ranks": 4,
+    "promotion_xp": 100,
+    "p_death": 0.01,
+    "execution_threshold": 50
+  },
+  "target": {
+    "preparation_time_min": 10,
+    "preparation_time_max": 50,
+    "difficulty_min": 1,
+    "difficulty_max": 10,
+    "obscurity_min": 1,
+    "obscurity_max": 10,
+    "reward_min": 100,
+    "reward_max": 500,
+    "xp_min": 10,
+    "xp_max": 50
+  },
+  "info": {
+    "weight_min": 1,
+    "weight_max": 5,
+    "p_true": 0.8
+  },
+  "agent": {
+    "initial_trust": 50,
+    "trust_decrement": 10,
+    "inform_plans_threshold": 30
+  },
+  "police": {
+    "start_threshold": 99,
+    "autostart_threshold": 200,
+    "arrest_time_min": 10,
+    "arrest_time_max": 30
+  },
+  "sim_end": {
+    "gang_plans_thwarted": 10,
+    "gang_plans_succeed": 10,
+    "executed_agents": 5
+  }
+}

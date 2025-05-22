@@ -1,7 +1,11 @@
 
 #ifndef TARGET_GENERATOR_H
 #define TARGET_GENERATOR_H
+#include "Target.h"
 
-struct TargetGenerator {};
+class TargetGenerator {
+public:
+  Target getNewTarget();
+};
 
 #endif

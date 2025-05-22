@@ -1,8 +1,10 @@
 #include <unistd.h>
-#include "Member.h"
+#include "Config.h"
 #include <iostream>
 
 int main() {
-  std::cout << "Hello world!" << std::endl;
+
+  Config config;
+  config.load_from_file("Config.json");
   return 0;
 }

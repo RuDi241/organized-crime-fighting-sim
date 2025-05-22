@@ -1,6 +1,6 @@
 # Compiler and flags
 CXX = g++
-CXXFLAGS = -Wall -Wextra -g -Wno-unused-parameter -I./include -I/usr/include/freetype2 -pthread -D_POSIX_C_SOURCE=200809L
+CXXFLAGS = -Wall -Wextra -g -Wno-unused-parameter -I./include -I/usr/include/freetype2 -pthread -D_POSIX_C_SOURCE=200809L -std=c++20
 LDFLAGS = -lglfw -lGL -lm -lrt -pthread -lfreetype
 
 # Directories
@@ -19,7 +19,7 @@ CPP_OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(CPP_SRCS))
 OBJS = $(C_OBJS) $(CPP_OBJS)
 
 # Target executable
-TARGET = bakery_sim
+TARGET = simulate
 
 # Default target
 all: $(TARGET)

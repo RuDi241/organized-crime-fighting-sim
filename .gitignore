@@ -55,4 +55,4 @@ compile_commands.json
 .cache
 .idea
 .vscode
-bakery_sim
+simulate
