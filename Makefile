@@ -19,7 +19,7 @@ CPP_OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(CPP_SRCS))
 OBJS = $(C_OBJS) $(CPP_OBJS)
 
 # Target executable
-TARGET = simulate
+TARGET = crime_sim
 
 # Default target
 all: $(TARGET)
