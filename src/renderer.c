@@ -20,8 +20,7 @@ static Character characters[ASCII_CHARACTER_SET_SIZE]; // Store ASCII characters
 static FT_Library ft;
 static FT_Face face;
 
-static int baseWindowWidth = 1920;  // Render window size
-static int baseWindowHeight = 1080; // Render window size
+static int baseWindowWidth = 1920; // Render window size
 
 static int windowWidth = 1920;  // Default window size
 static int windowHeight = 1080; // Default window size
@@ -465,11 +464,11 @@ int initTextRenderer(const char *fontPath, int fontSize) {
     // Store character metrics for later use
     // Make sure this matches our Character struct
     Character character = {texture,
-                           face->glyph->bitmap.width,
-                           face->glyph->bitmap.rows,
+                           (int)face->glyph->bitmap.width,
+                           (int)face->glyph->bitmap.rows,
                            face->glyph->bitmap_left,
                            face->glyph->bitmap_top,
-                           face->glyph->advance.x};
+                           (unsigned int)face->glyph->advance.x};
     characters[c] = character;
   }
   glBindTexture(GL_TEXTURE_2D, 0);
