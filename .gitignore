@@ -55,4 +55,8 @@ compile_commands.json
 .cache
 .idea
 .vscode
+<<<<<<< HEAD
+=======
+bakery_sim
+>>>>>>> 579ebdb (Adding extra logging and .gitignore.)
 crime_sim
