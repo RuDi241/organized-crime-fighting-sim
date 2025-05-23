@@ -32,6 +32,7 @@ struct TargetConfig {
   // xp rewarded to each member
   int xp_min;
   int xp_max;
+  int target_generation_delay;
 };
 
 struct InfoConfig {

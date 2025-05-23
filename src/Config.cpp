@@ -136,6 +136,8 @@ bool Config::load_from_file(const std::string &filename) {
       target.reward_max = get_int_value(target_json, "reward_max");
       target.xp_min = get_int_value(target_json, "xp_min");
       target.xp_max = get_int_value(target_json, "xp_max");
+      target.target_generation_delay =
+          get_int_value(target_json, "target_generation_delay");
     } else {
       return false;
     }
@@ -232,6 +234,8 @@ bool Config::dump_to_file(const std::string &filename) const {
     add_number_to_object(target_obj, "reward_max", target.reward_max);
     add_number_to_object(target_obj, "xp_min", target.xp_min);
     add_number_to_object(target_obj, "xp_max", target.xp_max);
+    add_number_to_object(target_obj, "target_generation_delay",
+                         target.target_generation_delay);
 
     add_object_to_json(root.get(), "target", target_obj);
 
@@ -333,7 +337,8 @@ Config::Config() {
             .reward_min = 100,
             .reward_max = 500,
             .xp_min = 10,
-            .xp_max = 50};
+            .xp_max = 50,
+            .target_generation_delay = 1};
 
   // Info configuration
   info = {.weight_min = 1, .weight_max = 5, .p_true = 0.8};

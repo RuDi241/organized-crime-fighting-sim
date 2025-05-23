@@ -1,4 +1,8 @@
 #include "MemberGenerator.h"
+#include "GangMember.h"
+#include "MemberGeneratorMessage.h"
+#include "NormalGangMember.h"
+#include "SecretAgent.h"
 #include <cstdlib>
 #include <ctime>
 #include <sys/msg.h>
@@ -19,6 +23,16 @@ GangMemberMessage MemberGenerator::generate() {
       serial_id++, config.gang.num_ranks, config.agent.initial_trust};
 }
 
+GangMember MemberGenerator::messageToMember(const GangMemberMessage &msg) {
+  if (msg.type == GangMemberType::SECRET_AGENT) {
+    SecretAgent member(msg);
+    return member;
+  } else {
+
+    NormalGangMember member(msg);
+    return member;
+  }
+}
 void MemberGenerator::run() {
   while (true) {
     GangMemberMessage message = generate();

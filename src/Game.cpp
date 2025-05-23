@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "MemberGenerator.h"
+#include "TargetGenerator.h"
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <sys/wait.h>
@@ -7,10 +8,12 @@
 
 Game::Game(const Config &config) : config(config) {
   member_generator_msq_id = spawnComponent<MemberGenerator>();
+  target_generator_msq_id = spawnComponent<TargetGenerator>();
 }
 
 Game::~Game() {
   cleanupQueue(member_generator_msq_id);
+  cleanupQueue(target_generator_msq_id);
   for (pid_t pid : children) {
     waitpid(pid, nullptr, 0);
   }

@@ -12,6 +12,7 @@ enum class OperationType {
   Kidnapping,
   BlackMailing,
   ArmsTrafficking,
+  COUNT,
 };
 
 // String conversion (to string)
@@ -40,7 +41,14 @@ struct Target {
   enum OperationType value;
   int id;
   int required_preparation;
-  int type;
+  int difficulty;
+  int obscurity;
+  int reward;
+  int xp;
 };
 
+struct TargetMessage {
+  long mType;
+  Target target;
+};
 #endif

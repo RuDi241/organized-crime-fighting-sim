@@ -16,6 +16,7 @@ private:
   const Config &config;
 
   int member_generator_msq_id = -1;
+  int target_generator_msq_id = -1;
   std::vector<pid_t> children;
 
   template <typename Component> int spawnComponent();

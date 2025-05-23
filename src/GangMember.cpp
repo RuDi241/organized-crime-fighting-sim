@@ -1,5 +1,5 @@
+#include "MemberGeneratorMessage.h"
 #include "GangMember.h"
-#include "MemberGenerator.h"
 // Constructor
 GangMember::GangMember(int ID, int rank, int trust)
     : ID(ID), rank(rank), trust(trust), preparation_counter(0), ready(false) {}

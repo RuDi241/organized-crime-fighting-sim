@@ -4,9 +4,9 @@
 #include "GangMember.h"
 
 class NormalGangMember : public GangMember {
-  public:
-    NormalGangMember(int ID, int rank, int trust);
-    NormalGangMember() = delete;
+public:
+  using GangMember::GangMember;
+  NormalGangMember() = delete;
 };
 
 #endif

@@ -1,7 +1,8 @@
 #ifndef GANG_MEMBER_H
 #define GANG_MEMBER_H
 
-#include "MemberGenerator.h"
+#include "MemberGeneratorMessage.h"
+
 class GangMember {
 public:
   GangMember(int ID, int rank, int trust);
