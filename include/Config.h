@@ -13,6 +13,9 @@ struct GangConfig {
   int promotion_xp;
   double p_death;
   int execution_threshold;
+
+  // probability of new member being agent
+  double p_agent;
 };
 
 struct TargetConfig {

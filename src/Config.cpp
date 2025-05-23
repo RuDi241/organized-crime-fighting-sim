@@ -116,6 +116,7 @@ bool Config::load_from_file(const std::string &filename) {
       gang.p_death = get_double_value(gang_json, "p_death");
       gang.execution_threshold =
           get_int_value(gang_json, "execution_threshold");
+      gang.p_agent = get_double_value(gang_json, "p_agent");
     } else {
       return false;
     }
@@ -207,6 +208,7 @@ bool Config::dump_to_file(const std::string &filename) const {
     add_number_to_object(gang_obj, "p_death", gang.p_death);
     add_number_to_object(gang_obj, "execution_threshold",
                          gang.execution_threshold);
+    add_number_to_object(gang_obj, "p_agent", gang.p_agent);
 
     add_object_to_json(root.get(), "gang", gang_obj);
 
@@ -314,7 +316,8 @@ Config::Config() {
           .num_ranks = 4,
           .promotion_xp = 100,
           .p_death = 0.01,
-          .execution_threshold = 50};
+          .execution_threshold = 50,
+          .p_agent = 0.1};
 
   // Target configuration
   target = {.preparation_time_min = 10,
