@@ -1,6 +1,53 @@
 #include "Police.h"
 #include <iostream>
+#include <sys/msg.h>
+
+
+Police::Police(const Config &config, int msq_id, int receive_msq_id)
+    : config(config), msqID(msq_id), agentsMsqID(receive_msq_id){
+  srand(time(NULL));
+}
 
 void Police::run() {
-    std::cout << "Police::run() called - mock implementation\n";
+    while (true)
+    {
+        ssize_t agentMessageSize = msgrcv(agentsMsqID, &agentMessage, sizeof(agentMessage)- sizeof(long),0, IPC_NOWAIT); 
+        if (agentMessageSize == -1) {
+            perror("msgrcv failed.");
+        } else if (agentMessageSize > 0) {
+            if (agentMessage.type == AgentMessageType::NORMAL_INFO) {
+                if (infoCounter.find(agentMessage.MessageID) == infoCounter.end()) {
+                    infoCounter[agentMessage.MessageID] = 1;
+                } else {
+                    infoCounter[agentMessage.MessageID]++;
+                    if(infoCounter[agentMessage.MessageID] == 2){
+                        totalGangInfo[agentMessage.gangID] += agentMessage.weight;
+                    }
+                }                
+            } else {
+                
+            }
+        }
+    }
+}
+
+void Police::catchGang(int gangID){
+
+    if (totalGangInfo[gangID] > 0) {
+        ArrestMessage message = generate(gangID);
+        if (msgsnd(msqID, &message, sizeof(ArrestMessage) - sizeof(long),0) == -1) {
+            perror("msgsnd failed");
+        }
+    }   
+}
+
+ArrestMessage Police::generate(int gangID){
+    int min = config.police.arrest_time_min;
+    int max = config.police.arrest_time_max;
+    int arrestPeriod = min + (rand() % (max - min + 1));
+    ArrestMessage message;
+    
+    message.gangID = gangID;
+    message.arrestPeriod = arrestPeriod;
+    return message;
 }

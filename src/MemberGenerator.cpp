@@ -28,7 +28,7 @@ GangMember MemberGenerator::messageToMember(const GangMemberMessage &msg) {
     SecretAgent member(msg);
     return member;
   } else {
-
+    
     NormalGangMember member(msg);
     return member;
   }
