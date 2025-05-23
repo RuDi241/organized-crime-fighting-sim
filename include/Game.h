@@ -21,7 +21,7 @@ private:
   std::vector<pid_t> children; 
 
   template <typename Component> int spawnComponent(); 
-  template <typename Component> int Game::spawnComponent(int receive_msq_id);
+  template <typename Component> int spawnComponent(int receive_msq_id);
   void cleanupQueue(int msq_id);
 };
 
