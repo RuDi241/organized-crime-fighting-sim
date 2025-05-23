@@ -4,7 +4,7 @@
 #include <unistd.h>
 
 TargetGenerator::TargetGenerator(const Config &config, int msq_id)
-    : config(config), msq_id(msq_id) {}
+    : config(config), msqID(msq_id) {}
 
 Target TargetGenerator::messageToTarget(const TargetMessage &message) {
   return message.target;
@@ -16,7 +16,7 @@ TargetMessage TargetGenerator::generate() {
   Target tgt = {
       .value = static_cast<OperationType>(
           rand() % static_cast<int>(OperationType::COUNT)),
-      .id = serial_id++,
+      .id = serialID++,
       .required_preparation =
           rand() % (tc.preparation_time_max - tc.preparation_time_min + 1) +
           tc.preparation_time_min,
@@ -35,7 +35,7 @@ void TargetGenerator::run() {
   while (true) {
     TargetMessage message = generate();
 
-    if (msgsnd(msq_id, &message, sizeof(TargetMessage) - sizeof(long), 0) ==
+    if (msgsnd(msqID, &message, sizeof(TargetMessage) - sizeof(long), 0) ==
         -1) {
       perror("msgsnd failed");
     }

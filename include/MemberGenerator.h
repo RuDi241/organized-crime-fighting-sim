@@ -16,8 +16,8 @@ public:
 
 private:
   const Config &config;
-  int msq_id;
-  int serial_id = 1;
+  int msqID;
+  int serialID = 1;
 };
 
 #endif

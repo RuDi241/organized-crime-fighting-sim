@@ -9,7 +9,7 @@
 #include <unistd.h>
 
 MemberGenerator::MemberGenerator(const Config &config, int msq_id)
-    : config(config), msq_id(msq_id) {
+    : config(config), msqID(msq_id) {
   srand(time(NULL));
 }
 
@@ -20,7 +20,7 @@ GangMemberMessage MemberGenerator::generate() {
       1, // mtype (must be first and > 0)
       (rnd < config.agent.p_agent) ? GangMemberType::SECRET_AGENT
                                    : GangMemberType::GANG_MEMBER,
-      serial_id++, config.gang.num_ranks, config.agent.initial_trust};
+      serialID++, config.gang.num_ranks, config.agent.initial_trust};
 }
 
 GangMember MemberGenerator::messageToMember(const GangMemberMessage &msg) {
@@ -38,7 +38,7 @@ void MemberGenerator::run() {
     GangMemberMessage message = generate();
 
     // Send the message to the message queue
-    if (msgsnd(msq_id, &message, sizeof(GangMemberMessage) - sizeof(long), 0) ==
+    if (msgsnd(msqID, &message, sizeof(GangMemberMessage) - sizeof(long), 0) ==
         -1) {
       perror("msgsnd failed");
       // handle error as appropriate (break, continue, or exit)

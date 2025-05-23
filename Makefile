@@ -1,6 +1,10 @@
-# Compiler and flags
+# Compilers
 CXX = g++
+CC  = gcc
+
+# Flags
 CXXFLAGS = -Wall -Wextra -g -Wno-unused-parameter -I./include -I/usr/include/freetype2 -pthread -D_POSIX_C_SOURCE=200809L -std=c++20
+CFLAGS   = -Wall -Wextra -g -Wno-unused-parameter -I./include -I/usr/include/freetype2 -pthread -D_POSIX_C_SOURCE=200809L
 LDFLAGS = -lglfw -lGL -lm -lrt -pthread -lfreetype
 
 # Directories
@@ -9,14 +13,14 @@ INCLUDE_DIR = include
 OBJ_DIR = obj
 
 # Source files
-C_SRCS = $(wildcard $(SRC_DIR)/*.c)
+C_SRCS   = $(wildcard $(SRC_DIR)/*.c)
 CPP_SRCS = $(wildcard $(SRC_DIR)/*.cpp)
-SRCS = $(C_SRCS) $(CPP_SRCS)
+SRCS     = $(C_SRCS) $(CPP_SRCS)
 
 # Object files
-C_OBJS = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(C_SRCS))
+C_OBJS   = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(C_SRCS))
 CPP_OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(CPP_SRCS))
-OBJS = $(C_OBJS) $(CPP_OBJS)
+OBJS     = $(C_OBJS) $(CPP_OBJS)
 
 # Target executable
 TARGET = crime_sim
@@ -24,16 +28,16 @@ TARGET = crime_sim
 # Default target
 all: $(TARGET)
 
-# Link the final executable
+# Link the final executable (use C++ linker if C++ is involved)
 $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 
-# Compile C source files
+# Compile C source files with gcc
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(wildcard $(INCLUDE_DIR)/*.h)
 	@mkdir -p $(OBJ_DIR)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
-# Compile C++ source files
+# Compile C++ source files with g++
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(wildcard $(INCLUDE_DIR)/*.h)
 	@mkdir -p $(OBJ_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@

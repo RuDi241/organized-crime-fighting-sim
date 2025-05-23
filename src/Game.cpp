@@ -7,13 +7,13 @@
 #include <unistd.h>
 
 Game::Game(const Config &config) : config(config) {
-  member_generator_msq_id = spawnComponent<MemberGenerator>();
-  target_generator_msq_id = spawnComponent<TargetGenerator>();
+  memberGeneratorMsqID = spawnComponent<MemberGenerator>();
+  targetGeneratorMsqID = spawnComponent<TargetGenerator>();
 }
 
 Game::~Game() {
-  cleanupQueue(member_generator_msq_id);
-  cleanupQueue(target_generator_msq_id);
+  cleanupQueue(memberGeneratorMsqID);
+  cleanupQueue(targetGeneratorMsqID);
   for (pid_t pid : children) {
     waitpid(pid, nullptr, 0);
   }

@@ -8,7 +8,7 @@
 class TargetGenerator {
 public:
   TargetGenerator() = delete;
-  TargetGenerator(const Config &config, int msq_id);
+  TargetGenerator(const Config &config, int msqID);
   static Target messageToTarget(const TargetMessage &message);
 
   void run();
@@ -17,8 +17,8 @@ private:
   TargetMessage generate();
 
   const Config &config;
-  int msq_id;
-  int serial_id = 1;
+  int msqID;
+  int serialID = 1;
 };
 
 #endif
