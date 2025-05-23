@@ -13,9 +13,7 @@ struct GangConfig {
   int promotion_xp;
   double p_death;
   int execution_threshold;
-
-  // probability of new member being agent
-  double p_agent;
+  int member_generation_delay;
 };
 
 struct TargetConfig {
@@ -48,6 +46,8 @@ struct AgentConfig {
   int initial_trust;
   int trust_decrement;
   int inform_plans_threshold;
+  // probability of new member being agent
+  double p_agent;
 };
 
 struct PoliceConfig {
@@ -76,7 +76,4 @@ struct Config {
   bool dump_to_file(const std::string &filename) const;
   Config();
 };
-
-struct Config make_default_config();
-int load_config_from_file(const char *filename, struct Config *config);
 #endif

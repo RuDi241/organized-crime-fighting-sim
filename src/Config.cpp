@@ -116,7 +116,8 @@ bool Config::load_from_file(const std::string &filename) {
       gang.p_death = get_double_value(gang_json, "p_death");
       gang.execution_threshold =
           get_int_value(gang_json, "execution_threshold");
-      gang.p_agent = get_double_value(gang_json, "p_agent");
+      gang.member_generation_delay =
+          get_int_value(gang_json, "member_generation_delay");
     } else {
       return false;
     }
@@ -154,6 +155,7 @@ bool Config::load_from_file(const std::string &filename) {
       agent.trust_decrement = get_int_value(agent_json, "trust_decrement");
       agent.inform_plans_threshold =
           get_int_value(agent_json, "inform_plans_threshold");
+      agent.p_agent = get_double_value(agent_json, "p_agent");
     } else {
       return false;
     }
@@ -208,7 +210,8 @@ bool Config::dump_to_file(const std::string &filename) const {
     add_number_to_object(gang_obj, "p_death", gang.p_death);
     add_number_to_object(gang_obj, "execution_threshold",
                          gang.execution_threshold);
-    add_number_to_object(gang_obj, "p_agent", gang.p_agent);
+    add_number_to_object(gang_obj, "member_generation_delay",
+                         gang.member_generation_delay);
 
     add_object_to_json(root.get(), "gang", gang_obj);
 
@@ -253,6 +256,7 @@ bool Config::dump_to_file(const std::string &filename) const {
     add_number_to_object(agent_obj, "inform_plans_threshold",
                          agent.inform_plans_threshold);
 
+    add_number_to_object(gang_obj, "p_agent", agent.p_agent);
     add_object_to_json(root.get(), "agent", agent_obj);
 
     // Create police object
@@ -317,7 +321,7 @@ Config::Config() {
           .promotion_xp = 100,
           .p_death = 0.01,
           .execution_threshold = 50,
-          .p_agent = 0.1};
+          .member_generation_delay = 1};
 
   // Target configuration
   target = {.preparation_time_min = 10,
@@ -335,8 +339,10 @@ Config::Config() {
   info = {.weight_min = 1, .weight_max = 5, .p_true = 0.8};
 
   // Agent configuration
-  agent = {
-      .initial_trust = 50, .trust_decrement = 1, .inform_plans_threshold = 20};
+  agent = {.initial_trust = 50,
+           .trust_decrement = 1,
+           .inform_plans_threshold = 20,
+           .p_agent = 0.1};
 
   // Police configuration
   police = {.start_threshold = 40,

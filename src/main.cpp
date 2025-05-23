@@ -5,7 +5,7 @@
 int main() {
   Config config;
   config.load_from_file("Config.json");
-  Game game;
+  Game game(config);
 
   return 0;
 }
