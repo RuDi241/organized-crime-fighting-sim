@@ -1,6 +1,7 @@
 #include "Police.h"
 #include <iostream>
 #include <sys/msg.h>
+#include <unistd.h>
 
 
 Police::Police(const Config &config, int msq_id, int receive_msq_id)
@@ -25,7 +26,7 @@ void Police::run() {
                     }
                 }                
             } else {
-                
+                sleep(1);
             }
         }
     }
