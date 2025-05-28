@@ -21,6 +21,7 @@ Game::~Game() {
   cleanupQueue(memberGeneratorMsqID);
   cleanupQueue(targetGeneratorMsqID);
   cleanupQueue(policeArrestGangMsqID);
+  cleanupQueue(agentToPoliceMsqID);
   for (pid_t pid : children) {
     waitpid(pid, nullptr, 0);
   }
