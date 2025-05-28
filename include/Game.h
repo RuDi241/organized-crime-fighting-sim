@@ -19,9 +19,9 @@ private:
   const Config &config;
   //includes ALL processes
   std::vector<pid_t> children; 
-
-  template <typename Component> int spawnComponent(); 
-  template <typename Component> int spawnComponent(int receive_msq_id);
+  int initMsq();
+  template <typename Component> void spawnComponent(int msq_id); 
+  template <typename Component> void spawnComponent(int msq_id, int receive_msq_id);
   void cleanupQueue(int msq_id);
 };
 

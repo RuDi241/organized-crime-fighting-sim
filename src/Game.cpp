@@ -8,9 +8,13 @@
 #include <unistd.h>
 
 Game::Game(const Config &config) : config(config) {
-  memberGeneratorMsqID = spawnComponent<MemberGenerator>();
-  targetGeneratorMsqID = spawnComponent<TargetGenerator>();
-  policeArrestGangMsqID = spawnComponent<Police>(agentToPoliceMsqID);
+  memberGeneratorMsqID = initMsq(); 
+  targetGeneratorMsqID = initMsq();
+  policeArrestGangMsqID = initMsq();
+  agentToPoliceMsqID = initMsq();
+  spawnComponent<MemberGenerator>(memberGeneratorMsqID);
+  spawnComponent<TargetGenerator>(targetGeneratorMsqID);
+  spawnComponent<Police>(policeArrestGangMsqID, agentToPoliceMsqID);
 }
 
 Game::~Game() {
@@ -24,13 +28,16 @@ Game::~Game() {
 
 void Game::run() {}
 
-template <typename Component> int Game::spawnComponent() {
+int Game::initMsq(){
   int msq_id = msgget(IPC_PRIVATE, IPC_CREAT | 0666);
   if (msq_id == -1) {
     perror("msgget failed");
     exit(EXIT_FAILURE);
   }
 
+  return msq_id;
+}
+template <typename Component> void Game::spawnComponent(int msq_id) {
   pid_t pid = fork();
   if (pid == 0) {
     // CHILD PROCESS
@@ -43,21 +50,12 @@ template <typename Component> int Game::spawnComponent() {
     perror("fork failed");
     exit(EXIT_FAILURE);
   }
-
-  return msq_id;
 }
 
 //overloaded spawnComponent to also handle the case when a component also listens to queue
-template <typename Component> int Game::spawnComponent(int receive_msq_id) {
-  int msq_id = msgget(IPC_PRIVATE, IPC_CREAT | 0666);
-  if (msq_id == -1) {
-    perror("msgget failed");
-    exit(EXIT_FAILURE);
-  }
-
+template <typename Component> void Game::spawnComponent(int msq_id, int receive_msq_id) {
   pid_t pid = fork();
   if (pid == 0) {
-    // CHILD PROCESS
     Component instance(config, msq_id, receive_msq_id);
     instance.run();
     _exit(0);
@@ -67,8 +65,6 @@ template <typename Component> int Game::spawnComponent(int receive_msq_id) {
     perror("fork failed");
     exit(EXIT_FAILURE);
   }
-
-  return msq_id;
 }
 
 
