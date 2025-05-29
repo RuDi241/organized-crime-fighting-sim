@@ -4,6 +4,8 @@
 #include "MemberGeneratorMessage.h"
 #include <pthread.h>
 #include "InformationMessage.h"
+#include <vector>
+
 class GangMember {
 public:
   GangMember(int ID, int rank, int trust);

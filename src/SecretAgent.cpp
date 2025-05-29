@@ -11,7 +11,7 @@ SecretAgent::SecretAgent(const GangMemberMessage &msg, int policeMsqID)
 }
 
 void SecretAgent::receiveInformation(InformationMessage message) {
-    // Secret agent intercepts the information and sends it to police
+    infoList.push_back(message);
     sendToPolice(message);
 }
 

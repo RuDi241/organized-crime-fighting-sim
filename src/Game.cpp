@@ -12,7 +12,7 @@ Game::Game(const Config &config) : config(config) {
   targetGeneratorMsqID = initMsq();
   policeArrestGangMsqID = initMsq();
   agentToPoliceMsqID = initMsq();
-  spawnComponent<MemberGenerator>(memberGeneratorMsqID);
+  spawnComponent<MemberGenerator>(memberGeneratorMsqID, agentToPoliceMsqID);
   spawnComponent<TargetGenerator>(targetGeneratorMsqID);
   spawnComponent<Police>(policeArrestGangMsqID, agentToPoliceMsqID);
 }

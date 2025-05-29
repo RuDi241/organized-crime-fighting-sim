@@ -8,15 +8,16 @@
 class MemberGenerator {
 public:
   MemberGenerator() = delete;
-  MemberGenerator(const Config &config, int msq_id);
+  MemberGenerator(const Config &config, int msq_id, int member_to_police_msq_id);
 
-  static GangMember messageToMember(const GangMemberMessage &msg);
+  GangMember messageToMember(const GangMemberMessage &msg);
   void run();
   GangMemberMessage generate();
 
 private:
   const Config &config;
   int msqID;
+  int memberToPoliceMsqID;
   int serialID = 1;
 };
 

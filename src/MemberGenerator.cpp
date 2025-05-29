@@ -8,8 +8,8 @@
 #include <sys/msg.h>
 #include <unistd.h>
 
-MemberGenerator::MemberGenerator(const Config &config, int msq_id)
-    : config(config), msqID(msq_id) {
+MemberGenerator::MemberGenerator(const Config &config, int msq_id, int member_to_police_msq_id)
+    : config(config), msqID(msq_id), memberToPoliceMsqID(member_to_police_msq_id) {
   srand(time(NULL));
 }
 
@@ -25,7 +25,7 @@ GangMemberMessage MemberGenerator::generate() {
 
 GangMember MemberGenerator::messageToMember(const GangMemberMessage &msg) {
   if (msg.type == GangMemberType::SECRET_AGENT) {
-    SecretAgent member(msg);
+    SecretAgent member(msg, this->memberToPoliceMsqID);
     return member;
   } else {
     
