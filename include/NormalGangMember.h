@@ -7,6 +7,8 @@ class NormalGangMember : public GangMember {
 public:
   using GangMember::GangMember;
   NormalGangMember() = delete;
+
+  void receiveInformation(InformationMessage message) override;
 };
 
 #endif

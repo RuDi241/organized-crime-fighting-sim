@@ -1,8 +1,7 @@
 #include "MemberGeneratorMessage.h"
 #include "GangMember.h"
-#include <unistd.h> // for usleep
+#include <unistd.h>
 
-// Constructor
 GangMember::GangMember(int ID, int rank, int trust)
     : ID(ID), rank(rank), trust(trust), preparation_counter(0), ready(false), 
     thread_running(false), should_stop(false) {
@@ -18,23 +17,23 @@ GangMember::GangMember(const GangMemberMessage &msg)
         pthread_cond_init(&counter_cond, nullptr);
       }
 
-// Destructor
 GangMember::~GangMember() {
     stopPreparationThread();
     pthread_mutex_destroy(&counter_mutex);
     pthread_cond_destroy(&counter_cond);
 }
 
-// Getter for ID
 int GangMember::getID() const { return ID; }
 
-// Getter for rank
 int GangMember::getRank() const { return rank; }
 
-// Setter for rank
 void GangMember::setRank(int newRank) { rank = newRank; }
 
-// Simulates some preparation logic
+void GangMember::receiveInformation(InformationMessage message) {
+    // Base implementation does nothing - normal members just receive info
+    // This is virtual so derived classes can override
+}
+
 void GangMember::prepare() {
     pthread_mutex_lock(&counter_mutex);
     
@@ -52,7 +51,6 @@ void GangMember::prepare() {
     pthread_mutex_unlock(&counter_mutex);
 }
 
-// Start the preparation thread (now private)
 void GangMember::startPreparationThread() {
     pthread_mutex_lock(&counter_mutex);
     if (!thread_running) {
@@ -92,29 +90,26 @@ void GangMember::runPreparationLoop() {
     pthread_mutex_lock(&counter_mutex);
     
     while (!should_stop) {
-        // Wait for work (prepare() was called) or stop signal
         while (preparation_counter <= 0 && !should_stop) {
             pthread_cond_wait(&counter_cond, &counter_mutex);
         }
         
         if (should_stop) break;
         
-        // Do the actual work
         if (preparation_counter > 0) {
-            pthread_mutex_unlock(&counter_mutex); // Release lock during sleep
+            pthread_mutex_unlock(&counter_mutex); 
             
-            usleep(100000); // Sleep for 100ms (simulating work)
+            usleep(100000); 
             
-            pthread_mutex_lock(&counter_mutex); // Re-acquire lock
+            pthread_mutex_lock(&counter_mutex);
             
             preparation_counter--;
             if (preparation_counter <= 0) {
                 ready = true;
             }
         }else {
-            // No waiting - just keep looping
             pthread_mutex_unlock(&counter_mutex);
-            usleep(100000); // Sleep even when no work
+            usleep(100000);
             pthread_mutex_lock(&counter_mutex);
         }
     }
@@ -122,6 +117,4 @@ void GangMember::runPreparationLoop() {
     pthread_mutex_unlock(&counter_mutex);
 }
 
-
-// Check if ready
 bool GangMember::isReady() const { return ready; }
