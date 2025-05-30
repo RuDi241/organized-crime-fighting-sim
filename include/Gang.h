@@ -5,11 +5,13 @@
 #include "GangMember.h"
 #include "Config.h"
 #include "utils.h"
+#include <memory>
 #include "Target.h"
 
 class Gang {
 public:
-  std::vector<GangMember> GangMembers;
+  //std::vector<GangMember> GangMembers;
+  std::vector<std::unique_ptr<GangMember>> GangMembers;
   std::vector<Target> targets;
 
   Gang(const Config &config, int ID, int capacity, int acceptacne_rate, int member_generator_msq_id, 

@@ -4,13 +4,13 @@
 #include "Config.h"
 #include "MemberGeneratorMessage.h"
 #include "GangMember.h"
-
+#include <memory>
 class MemberGenerator {
 public:
   MemberGenerator() = delete;
   MemberGenerator(const Config &config, int msq_id, int member_to_police_msq_id);
   
-  static GangMember messageToMember(const GangMemberMessage &msg);
+  static std::unique_ptr<GangMember> messageToMember(const GangMemberMessage &msg);
   void run();
   GangMemberMessage generate();
 

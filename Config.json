@@ -29,7 +29,8 @@
   "agent": {
     "initial_trust": 50,
     "trust_decrement": 10,
-    "inform_plans_threshold": 30
+    "inform_plans_threshold": 30,
+    "p_agent": 1.0
   },
   "police": {
     "start_threshold": 99,

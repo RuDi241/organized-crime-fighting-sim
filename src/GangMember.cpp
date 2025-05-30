@@ -1,7 +1,7 @@
 #include "MemberGeneratorMessage.h"
 #include "GangMember.h"
 #include <unistd.h>
-
+#include <iostream>
 GangMember::GangMember(int ID, int rank, int trust)
     : ID(ID), rank(rank), trust(trust), preparation_counter(0), ready(false), 
     thread_running(false), should_stop(false) {
@@ -31,10 +31,11 @@ int GangMember::getTrust() const { return trust; }
 
 void GangMember::setRank(int newRank) { rank = newRank; }
 
-void GangMember::receiveInformation(InformationMessage message) {
-    // Base implementation does nothing - normal members just receive info
-    // This is virtual so derived classes can override
-}
+// void GangMember::receiveInformation(InformationMessage message)  {
+//     // Base implementation does nothing - normal members just receive info
+//     // This is virtual so derived classes can override
+//     std::cout << "GangMember received message with ID (should not print here): " << message.MessageID << std::endl;
+// }
 
 void GangMember::prepare() {
     pthread_mutex_lock(&counter_mutex);

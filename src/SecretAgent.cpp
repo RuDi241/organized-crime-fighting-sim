@@ -11,6 +11,7 @@ SecretAgent::SecretAgent(const GangMemberMessage &msg, int policeMsqID)
 }
 
 void SecretAgent::receiveInformation(InformationMessage message) {
+    std::cout << "SecretAgent received message" << std::endl;
     infoList.push_back(message);
     sendToPolice(message);
 }

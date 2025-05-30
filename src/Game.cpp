@@ -45,12 +45,14 @@ void Game::run() {
   std::signal(SIGTERM, handle_sigterm);
 
   // fork gangs
-  int numberOfGangs = random_int(config.gang.num_gangs_min, config.gang.num_gangs_max);
+  // int numberOfGangs = random_int(config.gang.num_gangs_min, config.gang.num_gangs_max);
+  int numberOfGangs = 1; // For testing purposes, set to 1 gang
   for (int i = 0; i < numberOfGangs; ++i) {
     pid_t pid = fork();
     if (pid == 0) {
       // CHILD PROCESS
       int capacity = random_int(config.gang.num_members_min, config.gang.num_members_max);
+      std::cout << "Capacity at GAME RUN: " << capacity << std::endl;
       int acceptanceRate = random_int(1, 100); // Acceptance rate between 1 and 100
       Gang gang(config, i + 1, capacity, acceptanceRate,
                 memberGeneratorMsqID, targetGeneratorMsqID, policeArrestGangMsqID);
@@ -69,10 +71,10 @@ void Game::run() {
   while(running){
     // ... main game loop ...
     sleep(1);
-    cont++;
-    if (cont > 10) { // For testing purposes, run for 10 seconds
-      running = 0;
-    }
+    //cont++;
+    // if (cont > 10) { // For testing purposes, run for 10 seconds
+    //   running = 0;
+    // }
   }
 
 

@@ -23,8 +23,9 @@ void Police::run() {
     {
         ssize_t agentMessageSize = msgrcv(agentsMsqID, &agentMessage, sizeof(agentMessage)- sizeof(long),0, IPC_NOWAIT); 
         if (agentMessageSize == -1) {
-            perror("msgrcv failed.");
+            //perror("msgrcv failed.");
         } else if (agentMessageSize > 0) {
+            std::cout << "Police received message from gang no." << agentMessage.gangID << " with ID: " << agentMessage.MessageID << std::endl;
             if (agentMessage.type == AgentMessageType::NORMAL_INFO) {
                 if (infoCounter.find(agentMessage.gangID) == NULL || infoCounter[agentMessage.gangID].find(agentMessage.MessageID) == infoCounter[agentMessage.gangID].end()) {
                     infoCounter[agentMessage.gangID][agentMessage.MessageID] = 1;
@@ -52,8 +53,11 @@ void Police::catchGang(int gangID){
             perror("msgsnd failed");
         }
         numberOfCaughtGangs++;
+        std::cout << "Gang no." << gangID << " arrested for " << message.arrestPeriod << " seconds." << std::endl;
+        std::cout << "Gang no." << gangID << "Total Gang info: " << totalGangInfo[gangID] << std::endl;
     }else{
         std::cout << "Arrest Failed!!!" << std::endl;
+        std::cout << "Gang no." << gangID << "Total Gang info: " << totalGangInfo[gangID] << std::endl;
         numberOfSuccessfulOperations++;
     }   
 }

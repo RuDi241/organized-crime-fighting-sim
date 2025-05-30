@@ -19,25 +19,28 @@ Gang::Gang(const Config &config, int ID, int capacity, int acceptance_rate, int 
   GangMembers.reserve(capacity); // Optional: optimize memory allocation
 }
 
-// Accept a new member into the gang
 void Gang::acceptMember() {
   if (GangMembers.size() >= static_cast<size_t>(capacity)) {
-    std::cout << "Gang is full. Member rejected.\n";
+    std::cout << "Gang is full. Member rejected." << std::endl;
     return;
   }
   
   GangMemberMessage newMember;
-  ssize_t messageSize = msgrcv(memberGeneratorMsqID, &newMember, sizeof(newMember)- sizeof(long),0, IPC_NOWAIT);
+  ssize_t messageSize = msgrcv(memberGeneratorMsqID, &newMember, sizeof(newMember) - sizeof(long), 0, IPC_NOWAIT);
   if (messageSize == -1) {
-    perror("msgrcv failed.");
-  }else if(messageSize > 0) {
-    GangMember generatedMember = MemberGenerator::messageToMember(newMember);
-    GangMembers.push_back(generatedMember);
-    std::cout << "New member accepted: ID = " << generatedMember.getID()
-              << ", Rank = " << generatedMember.getRank() << std::endl;
-    std::cout << "GangMember accepted. Total now: " << GangMembers.size() << "\n";
+    // perror("msgrcv failed.");
+  } else if (messageSize > 0) {
+    int temp = 0;
+    if (newMember.type == GangMemberType::SECRET_AGENT) {
+      temp = 69;
+    }
+    std::cout << "Type of member: " << temp << std::endl;
+    // Directly push the unique_ptr returned by messageToMember
+    GangMembers.push_back(MemberGenerator::messageToMember(newMember));
+    std::cout << "New member accepted: ID = " << GangMembers.back()->getID() 
+              << ", Rank = " << GangMembers.back()->getRank() << std::endl;
+    std::cout << "GangMember accepted. Total now: " << GangMembers.size() << std::endl;
   }
-  
 }
 
 void Gang::informGangMembers() {
@@ -50,23 +53,26 @@ void Gang::informGangMembers() {
     message.weight = -message.weight;
   }
 
-  for (GangMember &member : GangMembers) {
+  for (auto &member : GangMembers) {
     float spreadProb = random_float(0, 1.0f);
     if (spreadProb < config.info.p_spread) {
-      member.receiveInformation(message);
+      member->receiveInformation(message);
     }
   }
+
+  std::cout << "Information element sent to gang members. Gang ID: " 
+            << ID << ", Weight: " << message.weight << std::endl;
 }
 
-bool checkAllReady(const std::vector<GangMember> &members) {
-  for (const GangMember &member : members) {
-    if (!member.isReady()) {
-      return false; // If any member is not ready, return false
-      std::cout << "Gang member " << member.getID() << " is not ready." << std::endl;
+bool checkAllReady(const std::vector<std::unique_ptr<GangMember>> &members) {
+  for (const auto &member : members) {
+    if (!member->isReady()) {
+      std::cout << "Gang member " << member->getID() << " is not ready." << std::endl;
       std::cout << "Gang cannot start operation yet." << std::endl;
+      return false;
     }
   }
-  return true; // All members are ready
+  return true;
 }
 
 void Gang::pickTarget() {
@@ -82,18 +88,17 @@ void Gang::pickTarget() {
   }
 }
 
-// Simulate the gang starting operations
 void Gang::startOperation() {
   InformationMessage message;
   message.MessageID = messageIdGenerator++;
   message.gangID = ID;
   message.type = InformationMessageType::ATTACK;
     
-  for (GangMember &member : GangMembers) {
-    member.receiveInformation(message);
+  for (auto &member : GangMembers) {
+    member->receiveInformation(message);
   }
   std::cout << "Gang " << ID << " starting operation with "
-        << GangMembers.size() << " members.\n";
+            << GangMembers.size() << " members.\n";
 }
 
 // Simulate gang members leaving jail
@@ -102,23 +107,25 @@ void Gang::leaveJail() {
 }
 
 void Gang::prepareAll() {
-  for (GangMember &member : GangMembers) {
-    member.prepare();
+  for (auto &member : GangMembers) {
+    member->prepare();
   }
+  std::cout << "Gang " << ID << " members are preparing for the operation." << std::endl;
 }
 
 void Gang::waitAllReady() {
   bool allReady = false;
   while (!allReady) {
     allReady = true;
-    for (const GangMember &member : GangMembers) {
-      if (!member.isReady()) {
+    for (const auto &member : GangMembers) {
+      if (!member->isReady()) {
         allReady = false;
         break;
       }
     }
     if (!allReady) sleep(1);
   }
+  std::cout << "All gang members are ready for the operation." << std::endl;
 }
 
 bool Gang::checkPoliceCaught() {
@@ -141,27 +148,27 @@ void Gang::investigateAndKill() {
     std::cout << "No gang members to investigate and kill.\n";
     return;
   }
-  // Simulate investigation and killing
-  /// choose the memeber with minimum trust 
-  int killIdx = 0;
+  // Choose the member with minimum trust 
+  size_t killIdx = 0;
   for (size_t i = 1; i < GangMembers.size(); ++i) {
-    if (GangMembers[i].getTrust() < GangMembers[killIdx].getTrust()) {
+    if (GangMembers[i]->getTrust() < GangMembers[killIdx]->getTrust()) {
       killIdx = i;
     }
   }
   std::cout << "Investigating and killing member with ID: "
-            << GangMembers[killIdx].getID() << " (Trust: "
-            << GangMembers[killIdx].getTrust() << ")" << std::endl;
+            << GangMembers[killIdx]->getID() << " (Trust: "
+            << GangMembers[killIdx]->getTrust() << ")" << std::endl;
   // Remove the member from the gang
   GangMembers.erase(GangMembers.begin() + killIdx);
 }
 
 // High-level orchestration
 void Gang::run() {
-  while(GangMembers.size() >= static_cast<size_t>(capacity)) {
+  std::cout << "Gang cap. : "<< capacity << std::endl;
+  while(GangMembers.size() < capacity) {
     acceptMember(); // Accept new members until capacity is reached
   }
-  std::cout << "Gang " << ID << " is ready to start operations.\n";
+  std::cout << "Gang " << ID << "with size: " << GangMembers.size() <<" is ready to start operations.\n";
 
   while (true) {
     pickTarget();
