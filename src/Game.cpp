@@ -17,7 +17,6 @@ volatile sig_atomic_t running = 1;
 extern "C" void handle_sigterm(int signum) {
   running = 0;
   write(STDOUT_FILENO, "Game is terminating...\n", 24);
-  _exit(0);
 }
 
 Game::Game(const Config &config) : config(config) {

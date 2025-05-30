@@ -16,7 +16,7 @@ private:
   int targetGeneratorMsqID = -1;
   int agentToPoliceMsqID = -1;
   int policeArrestGangMsqID = -1;
-  volatile int running = 1; // Flag to control the game loop
+  //volatile int running = 1; // Flag to control the game loop
   const Config &config;
   //includes ALL processes
   std::vector<pid_t> children; 

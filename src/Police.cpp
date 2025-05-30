@@ -38,7 +38,7 @@ void Police::run() {
             } else if (agentMessage.type == AgentMessageType::ATTACK) {
                 std::cout << "Police received attack message from gang no." << agentMessage.gangID << " with ID: " << agentMessage.MessageID << std::endl;
                 catchGang(agentMessage.gangID);
-                while(msgrcv(agentsMsqID, &agentMessage, sizeof(agentMessage)- sizeof(long),agentMessage.gangID, IPC_NOWAIT) > 0);
+                while(msgrcv(agentsMsqID, &agentMessage, sizeof(agentMessage)- sizeof(long), agentMessage.gangID, IPC_NOWAIT) > 0);
             } else {
                 std::cout << "Unknown message type received from gang no." << agentMessage.gangID << " with ID: " << agentMessage.MessageID << std::endl;
             }
@@ -53,6 +53,8 @@ void Police::run() {
             VisualizationMSQ::send(vizMessage);
         }
     }
+    std::cout << "Police operation ended. Caught gangs: " << numberOfCaughtGangs << ", Successful operations: " << numberOfSuccessfulOperations << std::endl;
+    std::cout << "Police process terminating..." << std::endl;
     kill(getppid(), SIGTERM); // Terminate the police process when the game ends
 }
 
