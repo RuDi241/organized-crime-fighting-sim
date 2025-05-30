@@ -1,11 +1,7 @@
 #ifndef VISUALIZATION_MESSAGE_H
 #define VISUALIZATION_MESSAGE_H
 
-#include "GangStruct.h"
 #include "MemberStruct.h"
-
-#include <cstdio>
-#include <cstring>
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
@@ -24,6 +20,8 @@ struct VisualizationMessage {
   long mtype;
   int gangID;
   int memberIdx; // index of updated member in the gang
+  int leaks;
+  int phase;
   MemberStruct member;
 };
 
