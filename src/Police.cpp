@@ -3,7 +3,7 @@
 #include <sys/msg.h>
 #include <unistd.h>
 #include <signal.h>
-
+#include "VisualizationMSQ.h"
 
 Police::Police(const Config &config, int msq_id, int receive_msq_id)
     : config(config), msqID(msq_id), agentsMsqID(receive_msq_id){
@@ -42,6 +42,14 @@ void Police::run() {
             } else {
                 std::cout << "Unknown message type received from gang no." << agentMessage.gangID << " with ID: " << agentMessage.MessageID << std::endl;
             }
+
+            VisualizationMessage vizMessage;
+            vizMessage.mtype = MessageType::UPDATE_GANG;
+            vizMessage.gangID = agentMessage.gangID;
+            vizMessage.memberIdx = -1; // Not updating a specific member
+            vizMessage.leaks = totalGangInfo[agentMessage.gangID];
+            vizMessage.phase = -1; // Assuming phase 0 for simplicity
+            VisualizationMSQ::send(vizMessage);
         }
     }
     kill(getppid(), SIGTERM); // Terminate the police process when the game ends
@@ -58,11 +66,27 @@ void Police::catchGang(int gangID){
         std::cout << "OPERATION OF GANG NO." << gangID << " FAILD!!!" << std::endl;
         std::cout << "Gang no." << gangID << " arrested for " << message.arrestPeriod << " seconds." << std::endl;
         std::cout << "Gang no." << gangID << "Total Gang info: " << totalGangInfo[gangID] << std::endl;
+
+        VisualizationMessage arrestMessage;
+        arrestMessage.mtype = MessageType::UPDATE_GANG;
+        arrestMessage.gangID = gangID;
+        arrestMessage.memberIdx = -1; // Not updating a specific member
+        arrestMessage.leaks = totalGangInfo[gangID];
+        arrestMessage.phase = 2; // Assuming phase 0 for simplicity
+        VisualizationMSQ::send(arrestMessage);
     }else{
         std::cout << "OPERATION OF GANG NO." << gangID << " SUCCESSED!!!" << std::endl;
         std::cout << "Arrest Failed!!!" << std::endl;
         std::cout << "Gang no." << gangID << "Total Gang info: " << totalGangInfo[gangID] << std::endl;
         numberOfSuccessfulOperations++;
+
+                VisualizationMessage arrestMessage;
+        arrestMessage.mtype = MessageType::UPDATE_GANG;
+        arrestMessage.gangID = gangID;
+        arrestMessage.memberIdx = -1; // Not updating a specific member
+        arrestMessage.leaks = 0;
+        arrestMessage.phase = 1; // Assuming phase 0 for simplicity
+        VisualizationMSQ::send(arrestMessage);
     }   
 }
 

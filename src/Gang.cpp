@@ -8,7 +8,7 @@
 #include "ArrestMessage.h"
 #include <csignal>
 #include <iostream>
-
+#include "VisualizationMSQ.h"
 
 // Constructor
 Gang::Gang(const Config &config, int ID, int capacity, int acceptance_rate, int member_generator_msq_id, 
@@ -17,6 +17,14 @@ Gang::Gang(const Config &config, int ID, int capacity, int acceptance_rate, int 
       acceptance_rate(acceptance_rate), memberGeneratorMsqID(member_generator_msq_id),
       targetGeneratorMsqID(target_generator_msq_id), policeArrestGangMsqID(police_arrest_gang_msq_id) {
   GangMembers.reserve(capacity); // Optional: optimize memory allocation
+
+      VisualizationMessage createGangVizMsg;
+      createGangVizMsg.mtype = MessageType::ADD_GANG;
+      createGangVizMsg.gangID = ID;
+      createGangVizMsg.memberIdx = -1; // No members yet
+      createGangVizMsg.leaks = -1; // No leaks initially
+      createGangVizMsg.phase = 0; // Initial phase
+      VisualizationMSQ::send(createGangVizMsg);
 }
 
 void Gang::acceptMember() {
@@ -40,6 +48,16 @@ void Gang::acceptMember() {
     std::cout << "New member accepted: ID = " << GangMembers.back()->getID() 
               << ", Rank = " << GangMembers.back()->getRank() << std::endl;
     std::cout << "GangMember accepted. Total now: " << GangMembers.size() << std::endl;
+
+    VisualizationMessage createGangMemVizMsg;
+    createGangMemVizMsg.mtype = MessageType::ADD_MEMBER;
+    createGangMemVizMsg.gangID = ID;
+    createGangMemVizMsg.memberIdx = newMember.ID; // Index of the new member
+    createGangMemVizMsg.leaks = -1; // No leaks initially
+    createGangMemVizMsg.phase = 0; // Initial phase
+    createGangMemVizMsg.member = {.ID = newMember.ID, .rank = newMember.rank, 
+      .trust = newMember.trust, .preparation_counter = 0, .ready = false, .type = newMember.type};  // Convert to MemberStruct
+    VisualizationMSQ::send(createGangMemVizMsg);
   }
 }
 
@@ -108,6 +126,15 @@ void Gang::startOperation() {
   int operationDuration = random_int(config.target.preparation_time_min, config.target.preparation_time_max);
   std::cout << "Gang " << ID << " operation will take " 
             << operationDuration << " seconds.\n";
+  
+  VisualizationMessage operationVizMsg;
+  operationVizMsg.mtype = MessageType::UPDATE_GANG;
+  operationVizMsg.gangID = ID;
+  operationVizMsg.memberIdx = -1; // Not updating a specific member
+  operationVizMsg.leaks = -1; // No leaks initially
+  operationVizMsg.phase = 1; // Operation phase
+  VisualizationMSQ::send(operationVizMsg);
+
   sleep(operationDuration); // Simulate operation time
   std::cout << "Gang " << ID << " operation completed.\n";
 
@@ -116,6 +143,13 @@ void Gang::startOperation() {
 // Simulate gang members leaving jail
 void Gang::leaveJail() {
   std::cout << "Gang " << ID << " members leaving jail.\n";
+  VisualizationMessage leaveJailVizMsg;
+  leaveJailVizMsg.mtype = MessageType::UPDATE_GANG;
+  leaveJailVizMsg.gangID = ID;
+  leaveJailVizMsg.memberIdx = -1; // Not updating a specific member
+  leaveJailVizMsg.leaks = -1; // No leaks initially
+  leaveJailVizMsg.phase = 0; // Back to preparation phase
+  VisualizationMSQ::send(leaveJailVizMsg);
 }
 
 void Gang::prepareAll() {
@@ -171,6 +205,12 @@ void Gang::investigateAndKill() {
             << GangMembers[killIdx]->getID() << " (Trust: "
             << GangMembers[killIdx]->getTrust() << ")" << std::endl;
   // Remove the member from the gang
+  VisualizationMessage killMemberVizMsg;
+  killMemberVizMsg.mtype = MessageType::REMOVE_MEMBER;
+  killMemberVizMsg.gangID = ID;
+  killMemberVizMsg.memberIdx = GangMembers[killIdx]->getID(); // ID of the member being killed
+  killMemberVizMsg.leaks = -1; // No leaks initially
+  VisualizationMSQ::send(killMemberVizMsg);
   GangMembers.erase(GangMembers.begin() + killIdx);
 }
 

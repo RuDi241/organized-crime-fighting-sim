@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "MemberGenerator.h"
 #include "TargetGenerator.h"
+#include "VisualizationMSQ.h"
 #include "Police.h"
 #include <sys/ipc.h>
 #include <sys/msg.h>
@@ -10,6 +11,7 @@
 #include "Gang.h"
 #include <csignal>
 #include <iostream>
+
 
 volatile sig_atomic_t running = 1;
 
