@@ -29,6 +29,10 @@ int GangMember::getRank() const { return rank; }
 
 int GangMember::getTrust() const { return trust; }
 
+void GangMember::setTrust(int newTrust){
+    trust = newTrust;
+}
+
 void GangMember::setRank(int newRank) { rank = newRank; }
 
 // void GangMember::receiveInformation(InformationMessage message)  {

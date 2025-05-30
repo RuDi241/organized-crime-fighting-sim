@@ -89,6 +89,9 @@ void Gang::informGangMembers() {
     float spreadProb = random_float(0, 1.0f);
     if (spreadProb < config.info.p_spread) {
       member->receiveInformation(message);
+      int trust = member->getTrust();
+      trust += message.weight; // Update trust based on message weight
+      member->setTrust(trust);
     }
   }
 

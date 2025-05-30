@@ -16,6 +16,7 @@ public:
   int getID() const;
   int getRank() const;
   int getTrust() const;
+  void setTrust(int newTrust);
   void setRank(int rank);
   void prepare();
   bool isReady() const;

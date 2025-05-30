@@ -2,8 +2,8 @@
   "gang": {
     "num_gangs_min": 1,
     "num_gangs_max": 4,
-    "num_members_min": 5,
-    "num_members_max": 10,
+    "num_members_min": 2,
+    "num_members_max": 5,
     "num_ranks": 4,
     "promotion_xp": 100,
     "p_death": 0.01,
@@ -31,7 +31,7 @@
     "initial_trust": 50,
     "trust_decrement": 10,
     "inform_plans_threshold": 30,
-    "p_agent": 1.0
+    "p_agent": 0.5
   },
   "police": {
     "start_threshold": 99,
