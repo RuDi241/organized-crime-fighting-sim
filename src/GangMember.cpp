@@ -2,6 +2,7 @@
 #include "GangMember.h"
 #include <unistd.h>
 #include <iostream>
+#include "VisualizationMSQ.h"
 GangMember::GangMember(int ID, int rank, int trust)
     : ID(ID), rank(rank), trust(trust), preparation_counter(0), ready(false), 
     thread_running(false), should_stop(false) {
@@ -111,6 +112,23 @@ void GangMember::runPreparationLoop() {
             pthread_mutex_lock(&counter_mutex);
             
             preparation_counter--;
+
+            VisualizationMessage vizMsg;
+            vizMsg.mtype = MessageType::UPDATE_MEMBER;
+            vizMsg.gangID = -1;
+            vizMsg.memberIdx = ID; // Use member ID as index
+            vizMsg.leaks = -1; // No leaks initially
+            vizMsg.phase = -1; // Preparation phase
+            vizMsg.capacity = -1; // Current capacity of the gang
+            vizMsg.member = {
+                .ID = ID,
+                .rank = rank,
+                .trust = trust,
+                .preparation_counter = preparation_counter,
+                .ready = ready,
+            };
+
+
             if (preparation_counter <= 0) {
                 ready = true;
             }

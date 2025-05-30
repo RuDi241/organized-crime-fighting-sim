@@ -27,6 +27,7 @@ Gang::Gang(const Config &config, int ID, int capacity, int acceptance_rate,
   createGangVizMsg.memberIdx = -1; // No members yet
   createGangVizMsg.leaks = 0;      // No leaks initially
   createGangVizMsg.phase = 0;      // Initial phase
+  createGangVizMsg.capacity = capacity; // Set initial capacity
   VisualizationMSQ::send(createGangVizMsg);
 }
 
