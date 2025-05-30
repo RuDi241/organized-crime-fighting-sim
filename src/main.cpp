@@ -10,7 +10,11 @@ int main() {
   Game game(config);
 
   // Create a message queue and set it here.
-  VisualizationMSQ::msqid = -1;
+  VisualizationMSQ::msqid = msgget(IPC_PRIVATE, IPC_CREAT | 0666);
+  if (VisualizationMSQ::msqid == -1) {
+    perror("Failed to create visulaization MSQ");
+    exit(1);
+  }
 
   pid_t pid = fork();
   if (pid == 0) {
