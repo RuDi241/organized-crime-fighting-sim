@@ -1,6 +1,6 @@
 #ifndef POLICE_H
 #define POLICE_H
-#include <unordered_map>
+#include <map>
 #include <vector>
 #include "Config.h"
 #include "AgentToPoliceMessage.h"
@@ -18,8 +18,8 @@ class Police {
         int msqID;
         int agentsMsqID;
         AgentMessage agentMessage;
-        std::unordered_map<int, std::unordered_map<int,int>> infoCounter;
-        std::vector<int> totalGangInfo;
+        std::map<int, std::map<int,int>> infoCounter;
+        std::map<int, int> totalGangInfo;
         void catchGang(int gangID);
         ArrestMessage generate(int gangID);
         int numberOfCaughtGangs = 0;

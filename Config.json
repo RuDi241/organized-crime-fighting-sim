@@ -24,7 +24,8 @@
   "info": {
     "weight_min": 1,
     "weight_max": 5,
-    "p_true": 0.8
+    "p_true": 0.8,
+    "p_spread": 0.8
   },
   "agent": {
     "initial_trust": 50,

@@ -27,18 +27,22 @@ void Police::run() {
         } else if (agentMessageSize > 0) {
             std::cout << "Police received message from gang no." << agentMessage.gangID << " with ID: " << agentMessage.MessageID << std::endl;
             if (agentMessage.type == AgentMessageType::NORMAL_INFO) {
-                if (infoCounter.find(agentMessage.gangID) == NULL || infoCounter[agentMessage.gangID].find(agentMessage.MessageID) == infoCounter[agentMessage.gangID].end()) {
-                    infoCounter[agentMessage.gangID][agentMessage.MessageID] = 1;
-                } else {
+                std::cout << "Police received normal info from gang no." << agentMessage.gangID << " with ID: " << agentMessage.MessageID << std::endl;
+               // if (infoCounter.find(agentMessage.gangID) == NULL || infoCounter[agentMessage.gangID].find(agentMessage.MessageID) == infoCounter[agentMessage.gangID].end()) {
+   //                 infoCounter[agentMessage.gangID][agentMessage.MessageID] = 1;
+                //} else {
                     infoCounter[agentMessage.gangID][agentMessage.MessageID]++;
+                    std::cout << "Police received info from gang no." << agentMessage.gangID << " with ID: " << agentMessage.MessageID << "count" << infoCounter[agentMessage.gangID][agentMessage.MessageID] << std::endl;
                     if(infoCounter[agentMessage.gangID][agentMessage.MessageID] == 2){
+                        std::cout << "Police received 2 info from gang no." << agentMessage.gangID << " with ID: " << agentMessage.MessageID << std::endl;
                         totalGangInfo[agentMessage.gangID] += agentMessage.weight;
                     }
-                }                
+//                }                
             } else if (agentMessage.type == AgentMessageType::ATTACK) {
+                std::cout << "Police received attack message from gang no." << agentMessage.gangID << " with ID: " << agentMessage.MessageID << std::endl;
                 catchGang(agentMessage.gangID);
             } else {
-                sleep(1);
+                //sleep(1);
             }
         }
     }
