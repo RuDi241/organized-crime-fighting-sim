@@ -17,11 +17,11 @@ void Police::run() {
             perror("msgrcv failed.");
         } else if (agentMessageSize > 0) {
             if (agentMessage.type == AgentMessageType::NORMAL_INFO) {
-                if (infoCounter.find(agentMessage.MessageID) == infoCounter.end()) {
-                    infoCounter[agentMessage.MessageID] = 1;
+                if (infoCounter.find(agentMessage.gangID) == NULL || infoCounter[agentMessage.gangID].find(agentMessage.MessageID) == infoCounter[agentMessage.gangID].end()) {
+                    infoCounter[agentMessage.gangID][agentMessage.MessageID] = 1;
                 } else {
-                    infoCounter[agentMessage.MessageID]++;
-                    if(infoCounter[agentMessage.MessageID] == 2){
+                    infoCounter[agentMessage.gangID][agentMessage.MessageID]++;
+                    if(infoCounter[agentMessage.gangID][agentMessage.MessageID] == 2){
                         totalGangInfo[agentMessage.gangID] += agentMessage.weight;
                     }
                 }                

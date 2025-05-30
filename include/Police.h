@@ -16,7 +16,7 @@ class Police {
         int msqID;
         int agentsMsqID;
         AgentMessage agentMessage;
-        std::unordered_map<int,int> infoCounter;
+        std::unordered_map<int, std::unordered_map<int,int>> infoCounter;
         std::vector<int> totalGangInfo;
         void catchGang(int gangID);
         ArrestMessage generate(int gangID);
