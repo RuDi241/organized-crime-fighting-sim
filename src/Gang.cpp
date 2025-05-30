@@ -48,6 +48,9 @@ void Gang::informGangMembers() {
   message.MessageID = messageIdGenerator++;
   message.gangID = ID;
   message.weight = random_int(config.info.weight_min, config.info.weight_max);
+  message.type = InformationMessageType::NORMAL_INFO;
+  message.mtype = ID; // Set mtype to gang ID for message queue
+
   float trueProb = random_float(0, 1.0f);
   if (trueProb > config.info.p_true) {
     message.weight = -message.weight;
@@ -93,12 +96,21 @@ void Gang::startOperation() {
   message.MessageID = messageIdGenerator++;
   message.gangID = ID;
   message.type = InformationMessageType::ATTACK;
+  message.mtype = ID; // Set mtype to gang ID for message queue
     
   for (auto &member : GangMembers) {
     member->receiveInformation(message);
   }
   std::cout << "Gang " << ID << " starting operation with "
             << GangMembers.size() << " members.\n";
+
+  // Simulate operation duration
+  int operationDuration = random_int(config.target.preparation_time_min, config.target.preparation_time_max);
+  std::cout << "Gang " << ID << " operation will take " 
+            << operationDuration << " seconds.\n";
+  sleep(operationDuration); // Simulate operation time
+  std::cout << "Gang " << ID << " operation completed.\n";
+
 }
 
 // Simulate gang members leaving jail
@@ -178,7 +190,7 @@ void Gang::run() {
     startOperation();
     int jailPeriod = checkPoliceCaught();
     if (jailPeriod > 0) {
-      goToJail(jailPeriod); // Example jail time, replace with actual
+      goToJail(jailPeriod); // Go to jail if caught by police
       investigateAndKill();
       acceptMember(); // Accept new members after killing a member
     } 

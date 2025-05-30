@@ -19,7 +19,14 @@ void SecretAgent::receiveInformation(InformationMessage message) {
 void SecretAgent::sendToPolice(InformationMessage message) {
     AgentMessage agentMessage;
     agentMessage.mtype = message.mtype; // Message type for message queue
-    agentMessage.type = static_cast<AgentMessageType>(message.type);
+    if (message.type == InformationMessageType::NORMAL_INFO) {
+        agentMessage.type = AgentMessageType::NORMAL_INFO;
+    } else if (message.type == InformationMessageType::ATTACK) {
+        agentMessage.type = AgentMessageType::ATTACK;
+    } else {
+        std::cerr << "Unknown information message type received." << std::endl;
+        return; // Exit if the type is unknown
+    }
     agentMessage.gangID = message.gangID;
     agentMessage.MessageID = message.MessageID;
     agentMessage.weight = message.weight;

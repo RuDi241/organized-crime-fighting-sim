@@ -40,8 +40,8 @@
     "arrest_time_max": 30
   },
   "sim_end": {
-    "gang_plans_thwarted": 10,
-    "gang_plans_succeed": 10,
+    "gang_plans_thwarted": 2,
+    "gang_plans_succeed": 2,
     "executed_agents": 5
   }
 }

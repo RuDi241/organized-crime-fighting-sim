@@ -30,10 +30,10 @@ Game::Game(const Config &config) : config(config) {
 }
 
 Game::~Game() {
-  for (pid_t pid : children) {
-    kill(pid, SIGKILL); // Send termination signal to all child processes
-    waitpid(pid, nullptr, 0);
-  }
+  // for (pid_t pid : children) {
+  //   kill(pid, SIGKILL); // Send termination signal to all child processes
+  //   waitpid(pid, nullptr, 0);
+  // }
   cleanupQueue(memberGeneratorMsqID);
   cleanupQueue(targetGeneratorMsqID);
   cleanupQueue(policeArrestGangMsqID);
@@ -77,6 +77,11 @@ void Game::run() {
     // }
   }
 
+  std::cout << "Game loop ended. Cleaning up..." << std::endl;
+  for (pid_t pid : children) {
+    kill(pid, SIGKILL); // Send termination signal to all child processes
+    waitpid(pid, nullptr, 0);
+  }
 
 }
 

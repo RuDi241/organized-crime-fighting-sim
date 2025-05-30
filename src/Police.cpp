@@ -25,24 +25,22 @@ void Police::run() {
         if (agentMessageSize == -1) {
             //perror("msgrcv failed.");
         } else if (agentMessageSize > 0) {
-            std::cout << "Police received message from gang no." << agentMessage.gangID << " with ID: " << agentMessage.MessageID << std::endl;
+            std::cout << "Police received message from gang no." << agentMessage.gangID << " with ID: " << agentMessage.MessageID << " with type: " << (int)agentMessage.type << std::endl;
             if (agentMessage.type == AgentMessageType::NORMAL_INFO) {
                 std::cout << "Police received normal info from gang no." << agentMessage.gangID << " with ID: " << agentMessage.MessageID << std::endl;
-               // if (infoCounter.find(agentMessage.gangID) == NULL || infoCounter[agentMessage.gangID].find(agentMessage.MessageID) == infoCounter[agentMessage.gangID].end()) {
-   //                 infoCounter[agentMessage.gangID][agentMessage.MessageID] = 1;
-                //} else {
-                    infoCounter[agentMessage.gangID][agentMessage.MessageID]++;
-                    std::cout << "Police received info from gang no." << agentMessage.gangID << " with ID: " << agentMessage.MessageID << "count" << infoCounter[agentMessage.gangID][agentMessage.MessageID] << std::endl;
-                    if(infoCounter[agentMessage.gangID][agentMessage.MessageID] == 2){
-                        std::cout << "Police received 2 info from gang no." << agentMessage.gangID << " with ID: " << agentMessage.MessageID << std::endl;
-                        totalGangInfo[agentMessage.gangID] += agentMessage.weight;
-                    }
-//                }                
+                infoCounter[agentMessage.gangID][agentMessage.MessageID]++;
+
+                if(infoCounter[agentMessage.gangID][agentMessage.MessageID] == 2){
+                    std::cout << "Police received 2 info from gang no." << agentMessage.gangID << " with ID: " << agentMessage.MessageID << std::endl;
+                    totalGangInfo[agentMessage.gangID] += agentMessage.weight;
+                }           
+                     
             } else if (agentMessage.type == AgentMessageType::ATTACK) {
                 std::cout << "Police received attack message from gang no." << agentMessage.gangID << " with ID: " << agentMessage.MessageID << std::endl;
                 catchGang(agentMessage.gangID);
+                while(msgrcv(agentsMsqID, &agentMessage, sizeof(agentMessage)- sizeof(long),agentMessage.gangID, IPC_NOWAIT) > 0);
             } else {
-                //sleep(1);
+                std::cout << "Unknown message type received from gang no." << agentMessage.gangID << " with ID: " << agentMessage.MessageID << std::endl;
             }
         }
     }
@@ -57,9 +55,11 @@ void Police::catchGang(int gangID){
             perror("msgsnd failed");
         }
         numberOfCaughtGangs++;
+        std::cout << "OPERATION OF GANG NO." << gangID << " FAILD!!!" << std::endl;
         std::cout << "Gang no." << gangID << " arrested for " << message.arrestPeriod << " seconds." << std::endl;
         std::cout << "Gang no." << gangID << "Total Gang info: " << totalGangInfo[gangID] << std::endl;
     }else{
+        std::cout << "OPERATION OF GANG NO." << gangID << " SUCCESSED!!!" << std::endl;
         std::cout << "Arrest Failed!!!" << std::endl;
         std::cout << "Gang no." << gangID << "Total Gang info: " << totalGangInfo[gangID] << std::endl;
         numberOfSuccessfulOperations++;
