@@ -27,19 +27,16 @@ struct VisualizationMessage {
   MemberStruct member;
 };
 
-class MessageQueue {
+class VisualizationMSQ {
 public:
-  explicit MessageQueue(int queue_id);
-  ~MessageQueue();
+  static bool send(const VisualizationMessage &msg);
+  static bool receive(VisualizationMessage &msg,
+                      MessageType type = static_cast<MessageType>(0));
+  static bool try_receive(VisualizationMessage &msg,
+                          MessageType type = static_cast<MessageType>(0));
 
-  bool send(const VisualizationMessage &msg) const;
-  bool receive(VisualizationMessage &msg,
-               MessageType type = static_cast<MessageType>(0)) const;
-  bool try_receive(VisualizationMessage &msg,
-                   MessageType type = static_cast<MessageType>(0)) const;
-
-private:
-  int msgid;
+  // SET IN MAIN BEFORE USING THE CLASS
+  static int msqid;
 };
 
 #endif
