@@ -337,6 +337,8 @@ void Graphics::Update() {
           gang.leaks = msg.leaks;
         if (msg.phase != -1)
           gang.phase = static_cast<GangPhase>(msg.phase);
+        if (msg.capacity != -1)
+          gang.capacity = msg.capacity;
       }
       break;
     }
