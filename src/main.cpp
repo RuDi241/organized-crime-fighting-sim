@@ -1,4 +1,5 @@
 #include "Config.h"
+#include <cstdio>
 #include <unistd.h>
 #include <Game.h>
 #include "Graphics.h"
@@ -17,11 +18,15 @@ int main() {
   }
 
   pid_t pid = fork();
-  if (pid == 0) {
+  if (pid < 0) {
+    perror("Failed to fork");
+  } else if (pid == 0) {
     Graphics graphics;
     graphics.run();
   }
 
   game.run();
+
+  msgctl(VisualizationMSQ::msqid, IPC_RMID, nullptr);
   return 0;
 }

@@ -22,7 +22,7 @@ extern "C" void handle_sigterm(int signum) {
 }
 
 Game::Game(const Config &config) : config(config) {
-  memberGeneratorMsqID = initMsq(); 
+  memberGeneratorMsqID = initMsq();
   targetGeneratorMsqID = initMsq();
   policeArrestGangMsqID = initMsq();
   agentToPoliceMsqID = initMsq();
@@ -32,10 +32,10 @@ Game::Game(const Config &config) : config(config) {
 }
 
 Game::~Game() {
-  // for (pid_t pid : children) {
-  //   kill(pid, SIGKILL); // Send termination signal to all child processes
-  //   waitpid(pid, nullptr, 0);
-  // }
+  for (pid_t pid : children) {
+    kill(pid, SIGKILL); // Send termination signal to all child processes
+    waitpid(pid, nullptr, 0);
+  }
   cleanupQueue(memberGeneratorMsqID);
   cleanupQueue(targetGeneratorMsqID);
   cleanupQueue(policeArrestGangMsqID);
@@ -43,21 +43,24 @@ Game::~Game() {
 }
 
 void Game::run() {
-  // signal 
+  // signal
   std::signal(SIGTERM, handle_sigterm);
 
   // fork gangs
-  // int numberOfGangs = random_int(config.gang.num_gangs_min, config.gang.num_gangs_max);
+  // int numberOfGangs = random_int(config.gang.num_gangs_min,
+  // config.gang.num_gangs_max);
   int numberOfGangs = 1; // For testing purposes, set to 1 gang
   for (int i = 0; i < numberOfGangs; ++i) {
     pid_t pid = fork();
     if (pid == 0) {
       // CHILD PROCESS
-      int capacity = random_int(config.gang.num_members_min, config.gang.num_members_max);
+      int capacity =
+          random_int(config.gang.num_members_min, config.gang.num_members_max);
       std::cout << "Capacity at GAME RUN: " << capacity << std::endl;
-      int acceptanceRate = random_int(1, 100); // Acceptance rate between 1 and 100
-      Gang gang(config, i + 1, capacity, acceptanceRate,
-                memberGeneratorMsqID, targetGeneratorMsqID, policeArrestGangMsqID);
+      int acceptanceRate =
+          random_int(1, 100); // Acceptance rate between 1 and 100
+      Gang gang(config, i + 1, capacity, acceptanceRate, memberGeneratorMsqID,
+                targetGeneratorMsqID, policeArrestGangMsqID);
       gang.run();
       _exit(0);
     } else if (pid > 0) {
@@ -68,26 +71,23 @@ void Game::run() {
     }
   }
 
-  int cont = 0;
-
-  while(running){
+  while (running) {
     // ... main game loop ...
     sleep(1);
-    //cont++;
-    // if (cont > 10) { // For testing purposes, run for 10 seconds
-    //   running = 0;
-    // }
+    // cont++;
+    //  if (cont > 10) { // For testing purposes, run for 10 seconds
+    //    running = 0;
+    //  }
   }
 
   std::cout << "Game loop ended. Cleaning up..." << std::endl;
-  for (pid_t pid : children) {
-    kill(pid, SIGKILL); // Send termination signal to all child processes
-    waitpid(pid, nullptr, 0);
-  }
-
+  // for (pid_t pid : children) {
+  //   kill(pid, SIGKILL); // Send termination signal to all child processes
+  //   waitpid(pid, nullptr, 0);
+  // }
 }
 
-int Game::initMsq(){
+int Game::initMsq() {
   int msq_id = msgget(IPC_PRIVATE, IPC_CREAT | 0666);
   if (msq_id == -1) {
     perror("msgget failed");
@@ -111,8 +111,10 @@ template <typename Component> void Game::spawnComponent(int msq_id) {
   }
 }
 
-//overloaded spawnComponent to also handle the case when a component also listens to queue
-template <typename Component> void Game::spawnComponent(int msq_id, int receive_msq_id) {
+// overloaded spawnComponent to also handle the case when a component also
+// listens to queue
+template <typename Component>
+void Game::spawnComponent(int msq_id, int receive_msq_id) {
   pid_t pid = fork();
   if (pid == 0) {
     Component instance(config, msq_id, receive_msq_id);
@@ -125,7 +127,6 @@ template <typename Component> void Game::spawnComponent(int msq_id, int receive_
     exit(EXIT_FAILURE);
   }
 }
-
 
 void Game::cleanupQueue(int msq_id) {
   if (msq_id != -1) {
