@@ -13,9 +13,10 @@ enum MessageType : long {
   UPDATE_GANG,
   ADD_MEMBER,
   REMOVE_MEMBER,
-  UPDATE_MEMBER
+  UPDATE_MEMBER,
 };
 
+// enum class GangPhase { PREPARATION, OPERATION, JAILED };
 struct VisualizationMessage {
   long mtype;
   int gangID;

@@ -1,3 +1,4 @@
+#include "VisualizationMSQ.h"
 #define GANG_COLOR 0.0f, 0.0f, 1.0f // Bright Blue for gang lines, inset
 // circles
 // #define PREPARATION_COLOR \
@@ -305,4 +306,55 @@ void Graphics::drawScene(double currentTime) {
   for (size_t i = 0; i < gangs.size(); ++i) {
     drawGang(gangs[i], i, currentTime);
   }
+}
+
+void Graphics::update() {
+  VisualizationMessage msg;
+
+  // Try to receive a message from the queue (blocking)
+  if (!VisualizationMSQ::receive(msg)) {
+    // Failed to receive message
+    return;
+  }
+
+  // Validate gangID
+  if (msg.gangID < 0 || msg.gangID >= static_cast<int>(gangs.size()))
+    return;
+
+  GangStruct &gang = gangs[msg.gangID];
+
+  // Validate memberIdx
+  if (msg.memberIdx < 0 ||
+      msg.memberIdx >= static_cast<int>(gang.GangMembers.size()))
+    return;
+
+  MemberStruct &member = gang.GangMembers[msg.memberIdx];
+
+  // Update gang-level info if not -1
+  if (msg.leaks != -1)
+    gang.leaks = msg.leaks;
+
+  if (msg.phase != -1)
+    gang.phase = static_cast<GangPhase>(msg.phase);
+
+  // Update member-level info if not -1
+  if (msg.member.ID != -1)
+    member.ID = msg.member.ID;
+
+  if (msg.member.rank != -1)
+    member.rank = msg.member.rank;
+
+  if (msg.member.trust != -1)
+    member.trust = msg.member.trust;
+
+  if (msg.member.preparation_counter != -1)
+    member.preparation_counter = msg.member.preparation_counter;
+
+  // For bools, use 0 or 1 to signal validity; -1 to ignore
+  if (msg.member.ready != static_cast<bool>(-1))
+    member.ready = msg.member.ready;
+
+  // For enums, treat -1 as "do not update"
+  if (static_cast<int>(msg.member.type) != -1)
+    member.type = msg.member.type;
 }
