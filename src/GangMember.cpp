@@ -127,8 +127,8 @@ void GangMember::runPreparationLoop() {
                 .preparation_counter = preparation_counter,
                 .ready = ready,
             };
-
-
+            VisualizationMSQ::send(vizMsg);
+            
             if (preparation_counter <= 0) {
                 ready = true;
             }
