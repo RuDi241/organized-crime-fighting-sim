@@ -42,11 +42,7 @@ void Gang::acceptMember() {
   if (messageSize == -1) {
     // perror("msgrcv failed.");
   } else if (messageSize > 0) {
-    int temp = 0;
-    if (newMember.type == GangMemberType::SECRET_AGENT) {
-      temp = 69;
-    }
-    std::cout << "Type of member: " << temp << std::endl;
+
     // Directly push the unique_ptr returned by messageToMember
     GangMembers.push_back(MemberGenerator::messageToMember(newMember));
     std::cout << "New member accepted: ID = " << GangMembers.back()->getID()
