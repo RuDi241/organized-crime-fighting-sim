@@ -9,7 +9,7 @@ class MemberGenerator {
 public:
   MemberGenerator() = delete;
   MemberGenerator(const Config &config, int msq_id, int member_to_police_msq_id);
-
+  
   GangMember messageToMember(const GangMemberMessage &msg);
   void run();
   GangMemberMessage generate();

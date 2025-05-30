@@ -25,6 +25,8 @@ void Police::run() {
                         totalGangInfo[agentMessage.gangID] += agentMessage.weight;
                     }
                 }                
+            } else if (agentMessage.type == AgentMessageType::ATTACK) {
+                catchGang(agentMessage.gangID);
             } else {
                 sleep(1);
             }
@@ -33,12 +35,14 @@ void Police::run() {
 }
 
 void Police::catchGang(int gangID){
-
+    std::cout << "Start arresting gang no." << gangID << std::endl;
     if (totalGangInfo[gangID] > 0) {
         ArrestMessage message = generate(gangID);
         if (msgsnd(msqID, &message, sizeof(ArrestMessage) - sizeof(long),0) == -1) {
             perror("msgsnd failed");
         }
+    }else{
+        std::cout << "Arrest Failed!!!" << std::endl;
     }   
 }
 

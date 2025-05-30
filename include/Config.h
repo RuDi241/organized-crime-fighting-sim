@@ -52,9 +52,7 @@ struct AgentConfig {
 };
 
 struct PoliceConfig {
-  // requires future plans info
   int start_threshold;
-  // start operation without being informed about future plans
   int autostart_threshold;
   int arrest_time_min;
   int arrest_time_max;

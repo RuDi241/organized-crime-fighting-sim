@@ -16,6 +16,7 @@ public:
   int getCapacity() const;
   int getAcceptanceRate() const;
   void acceptMember(GangMember GangMember);
+  void informGangMembers();
   void startOperation();
   void leaveJail();
   void run();
