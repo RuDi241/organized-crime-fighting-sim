@@ -12,7 +12,6 @@
 #include <csignal>
 #include <iostream>
 
-
 volatile sig_atomic_t running = 1;
 
 extern "C" void handle_sigterm(int signum) {

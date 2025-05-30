@@ -145,6 +145,7 @@ void Graphics::run() {
 
 void Graphics::generateExampleData() {
   gangs.clear();
+  gangs.resize(5); // Ensure space for gang IDs 1 to 4, index 0 unused
 
   GangStruct gang1;
   gang1.ID = 1;
@@ -155,7 +156,7 @@ void Graphics::generateExampleData() {
                        {2, 1, 1, 0, false, GangMemberType::SECRET_AGENT},
                        {3, 1, 3, 10, true, GangMemberType::GANG_MEMBER},
                        {4, 2, 2, 3, false, GangMemberType::GANG_MEMBER}};
-  gangs.push_back(gang1);
+  gangs[1] = gang1;
 
   GangStruct gang2;
   gang2.ID = 2;
@@ -168,7 +169,7 @@ void Graphics::generateExampleData() {
                        {8, 1, 1, 0, false, GangMemberType::GANG_MEMBER},
                        {9, 5, 4, 10, true, GangMemberType::GANG_MEMBER},
                        {10, 2, 3, 2, false, GangMemberType::GANG_MEMBER}};
-  gangs.push_back(gang2);
+  gangs[2] = gang2;
 
   GangStruct gang3;
   gang3.ID = 3;
@@ -178,7 +179,7 @@ void Graphics::generateExampleData() {
   gang3.GangMembers = {{11, 3, 3, 7, true, GangMemberType::GANG_MEMBER},
                        {12, 2, 2, 5, false, GangMemberType::SECRET_AGENT},
                        {13, 4, 4, 9, true, GangMemberType::GANG_MEMBER}};
-  gangs.push_back(gang3);
+  gangs[3] = gang3;
 
   GangStruct gang4;
   gang4.ID = 4;
@@ -190,7 +191,7 @@ void Graphics::generateExampleData() {
                        {16, 5, 5, 10, true, GangMemberType::SECRET_AGENT},
                        {17, 2, 2, 3, false, GangMemberType::GANG_MEMBER},
                        {18, 4, 4, 6, false, GangMemberType::GANG_MEMBER}};
-  gangs.push_back(gang4);
+  gangs[4] = gang4;
 }
 
 void Graphics::drawStatusBar(double currentTime) {
@@ -203,7 +204,9 @@ void Graphics::drawStatusBar(double currentTime) {
   drawRectangle(rect);
 
   float x = STATUS_BAR_TEXT_X_START;
-  for (size_t i = 0; i < gangs.size(); ++i) {
+  for (size_t i = 1; i < gangs.size(); ++i) {
+    if (gangs[i].ID == 0)
+      continue; // Skip unused gangs
     std::string phaseText;
     switch (gangs[i].phase) {
     case GangPhase::PREPARATION:
@@ -227,7 +230,7 @@ void Graphics::drawGang(const GangStruct &gang, size_t gangIndex,
                         double currentTime) {
   float opacity = 1.0f;
   Color gangColor = {GANG_COLOR, opacity};
-  float columnX = COLUMN_X_START + gangIndex * COLUMN_X_SPACING;
+  float columnX = COLUMN_X_START + (gangIndex - 1) * COLUMN_X_SPACING;
 
   // Draw members
   for (size_t i = 0; i < gang.GangMembers.size(); ++i) {
@@ -246,7 +249,7 @@ void Graphics::drawGang(const GangStruct &gang, size_t gangIndex,
                    LEAKS_TEXT_Y, LEAKS_TEXT_SCALE, {TEXT_COLOR, opacity});
 
   // Draw gang title
-  float titleX = TITLE_X_START + gangIndex * TITLE_X_SPACING;
+  float titleX = TITLE_X_START + (gangIndex - 1) * TITLE_X_SPACING;
   std::string gangText = "Gang " + std::to_string(gang.ID) + " (" +
                          std::to_string(gang.GangMembers.size()) + "/" +
                          std::to_string(gang.capacity) + ")";
@@ -297,7 +300,9 @@ void Graphics::drawMember(const MemberStruct &member, float x, float y,
 
 void Graphics::drawScene(double currentTime) {
   drawStatusBar(currentTime);
-  for (size_t i = 0; i < gangs.size(); ++i) {
+  for (size_t i = 1; i < gangs.size(); ++i) {
+    if (gangs[i].ID == 0)
+      continue; // Skip unused gangs
     drawGang(gangs[i], i, currentTime);
   }
 }
@@ -310,7 +315,7 @@ void Graphics::Update() {
     switch (static_cast<MessageType>(msg.mtype)) {
     case ADD_GANG: {
       // Don't add if gangID already exists
-      if (msg.gangID >= 0 && msg.gangID >= static_cast<int>(gangs.size())) {
+      if (msg.gangID >= 1 && msg.gangID >= static_cast<int>(gangs.size())) {
         gangs.resize(msg.gangID + 1); // Ensure enough space
       }
       GangStruct &newGang = gangs[msg.gangID];
@@ -323,7 +328,7 @@ void Graphics::Update() {
     }
 
     case REMOVE_GANG: {
-      if (msg.gangID >= 0 && msg.gangID < static_cast<int>(gangs.size())) {
+      if (msg.gangID >= 1 && msg.gangID < static_cast<int>(gangs.size())) {
         gangs[msg.gangID].GangMembers.clear();
         gangs[msg.gangID] = GangStruct(); // Reset the gang
       }
@@ -331,7 +336,7 @@ void Graphics::Update() {
     }
 
     case UPDATE_GANG: {
-      if (msg.gangID >= 0 && msg.gangID < static_cast<int>(gangs.size())) {
+      if (msg.gangID >= 1 && msg.gangID < static_cast<int>(gangs.size())) {
         GangStruct &gang = gangs[msg.gangID];
         if (msg.leaks != -1)
           gang.leaks = msg.leaks;
@@ -344,7 +349,7 @@ void Graphics::Update() {
     }
 
     case ADD_MEMBER: {
-      if (msg.gangID >= 0 && msg.gangID < static_cast<int>(gangs.size())) {
+      if (msg.gangID >= 1 && msg.gangID < static_cast<int>(gangs.size())) {
         GangStruct &gang = gangs[msg.gangID];
         gang.GangMembers.push_back(msg.member);
       }
@@ -352,7 +357,7 @@ void Graphics::Update() {
     }
 
     case REMOVE_MEMBER: {
-      if (msg.gangID >= 0 && msg.gangID < static_cast<int>(gangs.size())) {
+      if (msg.gangID >= 1 && msg.gangID < static_cast<int>(gangs.size())) {
         GangStruct &gang = gangs[msg.gangID];
         if (msg.memberIdx >= 0 &&
             msg.memberIdx < static_cast<int>(gang.GangMembers.size())) {
@@ -363,7 +368,7 @@ void Graphics::Update() {
     }
 
     case UPDATE_MEMBER: {
-      if (msg.gangID >= 0 && msg.gangID < static_cast<int>(gangs.size())) {
+      if (msg.gangID >= 1 && msg.gangID < static_cast<int>(gangs.size())) {
         GangStruct &gang = gangs[msg.gangID];
         if (msg.memberIdx >= 0 &&
             msg.memberIdx < static_cast<int>(gang.GangMembers.size())) {
