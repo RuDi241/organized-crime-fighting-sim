@@ -11,10 +11,10 @@ private:
   void generateExampleData();
 
 public:
-  Graphics() {}
+  Graphics();
   void run();
   void drawScene(double currentTime);
-  void update();
+  void Update();
 };
 
 ;

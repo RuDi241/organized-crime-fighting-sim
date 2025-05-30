@@ -1,13 +1,5 @@
 #include "VisualizationMSQ.h"
 #define GANG_COLOR 0.0f, 0.0f, 1.0f // Bright Blue for gang lines, inset
-// circles
-// #define PREPARATION_COLOR \
-//   1.0f, 0.0f, 0.0f // Bright Red for preparation phase circle
-// #define OPERATION_COLOR \
-//   0.0f, 1.0f, 0.0f                    // Bright Green for operation phase
-//   circle
-// #define JAILED_COLOR 0.3f, 0.3f, 0.3f // Dark Gray for jailed phase circle
-// #define ARC_CHECK_COLOR 1.0f, 1.0f, 0.0f // Bright Yellow for preparation arc
 #define STAR_COLOR 1.0f, 0.5f, 0.0f // Orange for secret agent star
 #define TEXT_COLOR                                                             \
   1.0f, 1.0f, 1.0f // White for labels, titles, leaks, status bar text
@@ -66,8 +58,8 @@ constexpr float STAR_HEIGHT = STAR_SIZE * 0.8660254f; // sqrt(3)/2
 #include <cstdlib>
 #include <ctime>
 #include <string>
-#include <GLFW/glfw3.h>
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include "GangStruct.h"
 #include "MemberGeneratorMessage.h"
 #include "renderer.h"
@@ -77,6 +69,7 @@ static int window_height = 720;
 
 #define TARGET_FRAME_DURATION 0.0069
 
+Graphics::Graphics() {}
 void Graphics::run() {
   if (!glfwInit()) {
     printf("Failed to initialize GLFW\n");
@@ -114,7 +107,7 @@ void Graphics::run() {
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  generateExampleData();
+  Update();
 
   double startTime = glfwGetTime();
 
@@ -128,6 +121,7 @@ void Graphics::run() {
     glClearColor(BACKGROUND_COLOR, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    Update();
     drawScene(frameStart - startTime);
 
     glfwSwapBuffers(window);
@@ -308,53 +302,90 @@ void Graphics::drawScene(double currentTime) {
   }
 }
 
-void Graphics::update() {
+void Graphics::Update() {
   VisualizationMessage msg;
 
-  // Try to receive a message from the queue (blocking)
-  if (!VisualizationMSQ::receive(msg)) {
-    // Failed to receive message
-    return;
+  // Process all available messages in the queue
+  while (VisualizationMSQ::try_receive(msg)) {
+    switch (static_cast<MessageType>(msg.mtype)) {
+    case ADD_GANG: {
+      // Don't add if gangID already exists
+      if (msg.gangID >= 0 && msg.gangID >= static_cast<int>(gangs.size())) {
+        gangs.resize(msg.gangID + 1); // Ensure enough space
+      }
+      GangStruct &newGang = gangs[msg.gangID];
+      newGang.ID = msg.gangID;
+      if (msg.leaks != -1)
+        newGang.leaks = msg.leaks;
+      if (msg.phase != -1)
+        newGang.phase = static_cast<GangPhase>(msg.phase);
+      break;
+    }
+
+    case REMOVE_GANG: {
+      if (msg.gangID >= 0 && msg.gangID < static_cast<int>(gangs.size())) {
+        gangs[msg.gangID].GangMembers.clear();
+        gangs[msg.gangID] = GangStruct(); // Reset the gang
+      }
+      break;
+    }
+
+    case UPDATE_GANG: {
+      if (msg.gangID >= 0 && msg.gangID < static_cast<int>(gangs.size())) {
+        GangStruct &gang = gangs[msg.gangID];
+        if (msg.leaks != -1)
+          gang.leaks = msg.leaks;
+        if (msg.phase != -1)
+          gang.phase = static_cast<GangPhase>(msg.phase);
+      }
+      break;
+    }
+
+    case ADD_MEMBER: {
+      if (msg.gangID >= 0 && msg.gangID < static_cast<int>(gangs.size())) {
+        GangStruct &gang = gangs[msg.gangID];
+        gang.GangMembers.push_back(msg.member);
+      }
+      break;
+    }
+
+    case REMOVE_MEMBER: {
+      if (msg.gangID >= 0 && msg.gangID < static_cast<int>(gangs.size())) {
+        GangStruct &gang = gangs[msg.gangID];
+        if (msg.memberIdx >= 0 &&
+            msg.memberIdx < static_cast<int>(gang.GangMembers.size())) {
+          gang.GangMembers.erase(gang.GangMembers.begin() + msg.memberIdx);
+        }
+      }
+      break;
+    }
+
+    case UPDATE_MEMBER: {
+      if (msg.gangID >= 0 && msg.gangID < static_cast<int>(gangs.size())) {
+        GangStruct &gang = gangs[msg.gangID];
+        if (msg.memberIdx >= 0 &&
+            msg.memberIdx < static_cast<int>(gang.GangMembers.size())) {
+          MemberStruct &member = gang.GangMembers[msg.memberIdx];
+
+          if (msg.member.ID != -1)
+            member.ID = msg.member.ID;
+          if (msg.member.rank != -1)
+            member.rank = msg.member.rank;
+          if (msg.member.trust != -1)
+            member.trust = msg.member.trust;
+          if (msg.member.preparation_counter != -1)
+            member.preparation_counter = msg.member.preparation_counter;
+          if (static_cast<int>(msg.member.ready) != -1)
+            member.ready = msg.member.ready;
+          if (static_cast<int>(msg.member.type) != -1)
+            member.type = msg.member.type;
+        }
+      }
+      break;
+    }
+
+    default:
+      break;
+    }
   }
-
-  // Validate gangID
-  if (msg.gangID < 0 || msg.gangID >= static_cast<int>(gangs.size()))
-    return;
-
-  GangStruct &gang = gangs[msg.gangID];
-
-  // Validate memberIdx
-  if (msg.memberIdx < 0 ||
-      msg.memberIdx >= static_cast<int>(gang.GangMembers.size()))
-    return;
-
-  MemberStruct &member = gang.GangMembers[msg.memberIdx];
-
-  // Update gang-level info if not -1
-  if (msg.leaks != -1)
-    gang.leaks = msg.leaks;
-
-  if (msg.phase != -1)
-    gang.phase = static_cast<GangPhase>(msg.phase);
-
-  // Update member-level info if not -1
-  if (msg.member.ID != -1)
-    member.ID = msg.member.ID;
-
-  if (msg.member.rank != -1)
-    member.rank = msg.member.rank;
-
-  if (msg.member.trust != -1)
-    member.trust = msg.member.trust;
-
-  if (msg.member.preparation_counter != -1)
-    member.preparation_counter = msg.member.preparation_counter;
-
-  // For bools, use 0 or 1 to signal validity; -1 to ignore
-  if (msg.member.ready != static_cast<bool>(-1))
-    member.ready = msg.member.ready;
-
-  // For enums, treat -1 as "do not update"
-  if (static_cast<int>(msg.member.type) != -1)
-    member.type = msg.member.type;
 }

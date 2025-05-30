@@ -12,11 +12,12 @@ int main() {
   // Create a message queue and set it here.
   VisualizationMSQ::msqid = -1;
 
-  game.run();
   pid_t pid = fork();
   if (pid == 0) {
     Graphics graphics;
     graphics.run();
   }
+
+  game.run();
   return 0;
 }
