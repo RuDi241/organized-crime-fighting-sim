@@ -154,13 +154,14 @@ void Gang::startOperation() {
   sleep(operationDuration); // Simulate operation time
   std::cout << "Gang " << ID << " operation completed.\n";
 
-  operationVizMsg.mtype = MessageType::UPDATE_GANG;
-  operationVizMsg.gangID = ID;
-  operationVizMsg.memberIdx = -1; // Not updating a specific member
-  operationVizMsg.leaks = -1;     // No leaks initially
-  operationVizMsg.phase = 0;      // Operation phase
-  operationVizMsg.capacity = -1;  // Current capacity of the gang
-  VisualizationMSQ::send(operationVizMsg);
+  VisualizationMessage operationVizMsg1;
+  operationVizMsg1.mtype = MessageType::UPDATE_GANG;
+  operationVizMsg1.gangID = ID;
+  operationVizMsg1.memberIdx = -1; // Not updating a specific member
+  operationVizMsg1.leaks = -1;     // No leaks initially
+  operationVizMsg1.phase = 0;      // Operation phase
+  operationVizMsg1.capacity = -1;  // Current capacity of the gang
+  VisualizationMSQ::send(operationVizMsg1);
 }
 
 // Simulate gang members leaving jail
