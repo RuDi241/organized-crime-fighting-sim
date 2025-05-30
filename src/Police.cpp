@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sys/msg.h>
 #include <unistd.h>
+#include <signal.h>
 
 
 Police::Police(const Config &config, int msq_id, int receive_msq_id)
@@ -9,8 +10,16 @@ Police::Police(const Config &config, int msq_id, int receive_msq_id)
   srand(time(NULL));
 }
 
+int Police::getNumberOfCaughtGangs() {
+    return numberOfCaughtGangs;
+}
+
+int Police::getNumberOfSuccessfulOperations() {
+    return numberOfSuccessfulOperations;
+}
+
 void Police::run() {
-    while (true)
+    while (numberOfCaughtGangs < config.sim_end.gang_plans_thwarted && numberOfSuccessfulOperations < config.sim_end.gang_plans_succeed)
     {
         ssize_t agentMessageSize = msgrcv(agentsMsqID, &agentMessage, sizeof(agentMessage)- sizeof(long),0, IPC_NOWAIT); 
         if (agentMessageSize == -1) {
@@ -32,6 +41,7 @@ void Police::run() {
             }
         }
     }
+    kill(getppid(), SIGTERM); // Terminate the police process when the game ends
 }
 
 void Police::catchGang(int gangID){
@@ -41,8 +51,10 @@ void Police::catchGang(int gangID){
         if (msgsnd(msqID, &message, sizeof(ArrestMessage) - sizeof(long),0) == -1) {
             perror("msgsnd failed");
         }
+        numberOfCaughtGangs++;
     }else{
         std::cout << "Arrest Failed!!!" << std::endl;
+        numberOfSuccessfulOperations++;
     }   
 }
 
@@ -51,7 +63,7 @@ ArrestMessage Police::generate(int gangID){
     int max = config.police.arrest_time_max;
     int arrestPeriod = min + (rand() % (max - min + 1));
     ArrestMessage message;
-    
+    message.mtype = gangID; // Message type for message queue
     message.gangID = gangID;
     message.arrestPeriod = arrestPeriod;
     return message;

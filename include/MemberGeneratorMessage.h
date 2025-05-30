@@ -9,6 +9,7 @@ enum class GangMemberType : int {
 struct GangMemberMessage {
   long mtype; // Required for System V msg queues, typically > 0
   GangMemberType type;
+  int memberToPoliceMsqID; // ID of the message queue for police communication
   int ID;
   int rank;
   int trust;

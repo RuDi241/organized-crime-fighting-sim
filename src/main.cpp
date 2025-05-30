@@ -11,5 +11,7 @@ int main() {
   // Create a message queue and set it here.
   VisualizationMSQ::msqid = -1;
 
+  game.run();
+
   return 0;
 }

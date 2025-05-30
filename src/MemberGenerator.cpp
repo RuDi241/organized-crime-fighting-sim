@@ -20,12 +20,13 @@ GangMemberMessage MemberGenerator::generate() {
       1, // mtype (must be first and > 0)
       (rnd < config.agent.p_agent) ? GangMemberType::SECRET_AGENT
                                    : GangMemberType::GANG_MEMBER,
+      memberToPoliceMsqID, // ID of the message queue for police communication
       serialID++, config.gang.num_ranks, config.agent.initial_trust};
 }
 
 GangMember MemberGenerator::messageToMember(const GangMemberMessage &msg) {
   if (msg.type == GangMemberType::SECRET_AGENT) {
-    SecretAgent member(msg, this->memberToPoliceMsqID);
+    SecretAgent member(msg, msg.memberToPoliceMsqID);
     return member;
   } else {
     

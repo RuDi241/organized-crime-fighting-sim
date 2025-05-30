@@ -6,6 +6,18 @@
 #include <sys/msg.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include "utils.h"
+#include "Gang.h"
+#include <csignal>
+#include <iostream>
+
+volatile sig_atomic_t running = 1;
+
+extern "C" void handle_sigterm(int signum) {
+  running = 0;
+  write(STDOUT_FILENO, "Game is terminating...\n", 24);
+  _exit(0);
+}
 
 Game::Game(const Config &config) : config(config) {
   memberGeneratorMsqID = initMsq(); 
@@ -18,16 +30,53 @@ Game::Game(const Config &config) : config(config) {
 }
 
 Game::~Game() {
+  for (pid_t pid : children) {
+    kill(pid, SIGKILL); // Send termination signal to all child processes
+    waitpid(pid, nullptr, 0);
+  }
   cleanupQueue(memberGeneratorMsqID);
   cleanupQueue(targetGeneratorMsqID);
   cleanupQueue(policeArrestGangMsqID);
   cleanupQueue(agentToPoliceMsqID);
-  for (pid_t pid : children) {
-    waitpid(pid, nullptr, 0);
-  }
 }
 
-void Game::run() {}
+void Game::run() {
+  // signal 
+  std::signal(SIGTERM, handle_sigterm);
+
+  // fork gangs
+  int numberOfGangs = random_int(config.gang.num_gangs_min, config.gang.num_gangs_max);
+  for (int i = 0; i < numberOfGangs; ++i) {
+    pid_t pid = fork();
+    if (pid == 0) {
+      // CHILD PROCESS
+      int capacity = random_int(config.gang.num_members_min, config.gang.num_members_max);
+      int acceptanceRate = random_int(1, 100); // Acceptance rate between 1 and 100
+      Gang gang(config, i + 1, capacity, acceptanceRate,
+                memberGeneratorMsqID, targetGeneratorMsqID, policeArrestGangMsqID);
+      gang.run();
+      _exit(0);
+    } else if (pid > 0) {
+      children.push_back(pid);
+    } else {
+      perror("fork failed");
+      exit(EXIT_FAILURE);
+    }
+  }
+
+  int cont = 0;
+
+  while(running){
+    // ... main game loop ...
+    sleep(1);
+    cont++;
+    if (cont > 10) { // For testing purposes, run for 10 seconds
+      running = 0;
+    }
+  }
+
+
+}
 
 int Game::initMsq(){
   int msq_id = msgget(IPC_PRIVATE, IPC_CREAT | 0666);
