@@ -54,7 +54,8 @@ void Gang::acceptMember() {
     createGangMemVizMsg.gangID = ID;
     createGangMemVizMsg.memberIdx = newMember.ID; // Index of the new member
     createGangMemVizMsg.leaks = -1; // No leaks initially
-    createGangMemVizMsg.phase = 0; // Initial phase
+    createGangMemVizMsg.capacity = -1; // Current capacity of the gang
+    createGangMemVizMsg.phase = -1; // Initial phase
     createGangMemVizMsg.member = {.ID = newMember.ID, .rank = newMember.rank, 
       .trust = newMember.trust, .preparation_counter = 0, .ready = false, .type = newMember.type};  // Convert to MemberStruct
     VisualizationMSQ::send(createGangMemVizMsg);
@@ -133,6 +134,7 @@ void Gang::startOperation() {
   operationVizMsg.memberIdx = -1; // Not updating a specific member
   operationVizMsg.leaks = -1; // No leaks initially
   operationVizMsg.phase = 1; // Operation phase
+  operationVizMsg.capacity = -1; // Current capacity of the gang
   VisualizationMSQ::send(operationVizMsg);
 
   sleep(operationDuration); // Simulate operation time
@@ -149,6 +151,7 @@ void Gang::leaveJail() {
   leaveJailVizMsg.memberIdx = -1; // Not updating a specific member
   leaveJailVizMsg.leaks = -1; // No leaks initially
   leaveJailVizMsg.phase = 0; // Back to preparation phase
+  leaveJailVizMsg.capacity = -1; // Reset capacity to original
   VisualizationMSQ::send(leaveJailVizMsg);
 }
 
@@ -210,6 +213,8 @@ void Gang::investigateAndKill() {
   killMemberVizMsg.gangID = ID;
   killMemberVizMsg.memberIdx = GangMembers[killIdx]->getID(); // ID of the member being killed
   killMemberVizMsg.leaks = -1; // No leaks initially
+  killMemberVizMsg.capacity = -1; // Back to preparation phase
+  killMemberVizMsg.phase = -1; // Back to preparation phase
   VisualizationMSQ::send(killMemberVizMsg);
   GangMembers.erase(GangMembers.begin() + killIdx);
 }

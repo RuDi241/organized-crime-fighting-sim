@@ -49,6 +49,7 @@ void Police::run() {
             vizMessage.memberIdx = -1; // Not updating a specific member
             vizMessage.leaks = totalGangInfo[agentMessage.gangID];
             vizMessage.phase = -1; // Assuming phase 0 for simplicity
+            vizMessage.capacity = -1; // Assuming no specific capacity update
             VisualizationMSQ::send(vizMessage);
         }
     }
@@ -73,6 +74,7 @@ void Police::catchGang(int gangID){
         arrestMessage.memberIdx = -1; // Not updating a specific member
         arrestMessage.leaks = totalGangInfo[gangID];
         arrestMessage.phase = 2; // Assuming phase 0 for simplicity
+        arrestMessage.capacity = -1; // Assuming no specific capacity update
         VisualizationMSQ::send(arrestMessage);
     }else{
         std::cout << "OPERATION OF GANG NO." << gangID << " SUCCESSED!!!" << std::endl;
@@ -80,12 +82,13 @@ void Police::catchGang(int gangID){
         std::cout << "Gang no." << gangID << "Total Gang info: " << totalGangInfo[gangID] << std::endl;
         numberOfSuccessfulOperations++;
 
-                VisualizationMessage arrestMessage;
+        VisualizationMessage arrestMessage;
         arrestMessage.mtype = MessageType::UPDATE_GANG;
         arrestMessage.gangID = gangID;
         arrestMessage.memberIdx = -1; // Not updating a specific member
         arrestMessage.leaks = 0;
-        arrestMessage.phase = 1; // Assuming phase 0 for simplicity
+        arrestMessage.phase = -1; // Assuming phase 0 for simplicity
+        arrestMessage.capacity = -1; // Assuming no specific capacity update
         VisualizationMSQ::send(arrestMessage);
     }   
 }
