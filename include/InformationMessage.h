@@ -2,8 +2,8 @@
 #define INFORMATION_MESSAGE_H
 
 enum class InformationMessageType : int {
-    NORMAL_INFO,
-    ATTACK,
+  NORMAL_INFO,
+  ATTACK,
 };
 
 struct InformationMessage {

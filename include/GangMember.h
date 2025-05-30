@@ -24,7 +24,7 @@ protected: // Changed from private to allow derived class access
   int ID;
   int rank;
   int trust;
-  int preparation_counter = 0; 
+  int preparation_counter = 0;
   bool ready = false; // Replaces int isReady for clarity
   pthread_t preparation_thread;
   pthread_mutex_t counter_mutex;
@@ -36,7 +36,7 @@ protected: // Changed from private to allow derived class access
 private:
   void startPreparationThread();
   void stopPreparationThread();
-  static void* preparationThreadFunction(void* arg);
+  static void *preparationThreadFunction(void *arg);
   void runPreparationLoop();
 };
 
