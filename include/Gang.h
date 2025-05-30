@@ -11,13 +11,13 @@ public:
   std::vector<GangMember> GangMembers;
   //std::vector<Target> targets;
 
-  Gang(const Config &config, int ID, int capacity, int acceptacne_rate);
+  Gang(const Config &config, int ID, int capacity, int acceptacne_rate, int member_generator_msq_id);
   Gang() = delete;
 
   int getID() const;
   int getCapacity() const;
   int getAcceptanceRate() const;
-  void acceptMember(GangMember GangMember);
+  void acceptMember();
   void informGangMembers();
   void startOperation();
   void leaveJail();
@@ -29,6 +29,7 @@ private:
   int acceptance_rate;
   const Config &config;
   int messageIdGenerator = 1;
+  int memberGeneratorMsqID;
 };
 
 #endif
