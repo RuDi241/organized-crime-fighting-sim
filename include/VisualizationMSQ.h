@@ -23,6 +23,7 @@ struct VisualizationMessage {
   int memberIdx; // index of updated member in the gang
   int leaks;
   int phase;
+  int capacity;
   MemberStruct member;
 };
 
