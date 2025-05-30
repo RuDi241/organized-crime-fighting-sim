@@ -9,8 +9,6 @@ struct MemberStruct {
   int trust;
   int preparation_counter = 0;
   bool ready = false;
-  bool thread_running = false;
-  bool should_stop = false;
   GangMemberType type;
 };
 

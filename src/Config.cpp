@@ -147,6 +147,7 @@ bool Config::load_from_file(const std::string &filename) {
       info.weight_min = get_int_value(info_json, "weight_min");
       info.weight_max = get_int_value(info_json, "weight_max");
       info.p_true = get_double_value(info_json, "p_true");
+      info.p_spread = get_double_value(info_json, "p_spread");
     } else {
       return false;
     }
@@ -247,6 +248,7 @@ bool Config::dump_to_file(const std::string &filename) const {
     add_number_to_object(info_obj, "weight_min", info.weight_min);
     add_number_to_object(info_obj, "weight_max", info.weight_max);
     add_number_to_object(info_obj, "p_true", info.p_true);
+    add_number_to_object(info_obj, "p_spread", info.p_spread);
 
     add_object_to_json(root.get(), "info", info_obj);
 
@@ -341,7 +343,7 @@ Config::Config() {
             .target_generation_delay = 1};
 
   // Info configuration
-  info = {.weight_min = 1, .weight_max = 5, .p_true = 0.8};
+  info = {.weight_min = 1, .weight_max = 5, .p_true = 0.8, .p_spread = 0.3};
 
   // Agent configuration
   agent = {.initial_trust = 50,

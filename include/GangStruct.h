@@ -8,8 +8,6 @@ struct GangStruct {
   std::vector<MemberStruct> GangMembers;
   int ID;
   int capacity;
-  int acceptance_rate;
-  int messageIdGenerator = 1;
 };
 
 #endif

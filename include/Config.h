@@ -41,6 +41,7 @@ struct InfoConfig {
   int weight_max;
   // Probability of generated info being true
   double p_true;
+  double p_spread;
 };
 
 struct AgentConfig {
