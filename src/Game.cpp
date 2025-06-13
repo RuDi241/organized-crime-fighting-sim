@@ -45,9 +45,8 @@ void Game::run() {
   std::signal(SIGTERM, handle_sigterm);
 
   // fork gangs
-  // int numberOfGangs = random_int(config.gang.num_gangs_min,
-  // config.gang.num_gangs_max);
-  int numberOfGangs = 1; // For testing purposes, set to 1 gang
+  int numberOfGangs =
+      random_int(config.gang.num_gangs_min, config.gang.num_gangs_max);
   for (int i = 0; i < numberOfGangs; ++i) {
     pid_t pid = fork();
     if (pid == 0) {

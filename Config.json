@@ -3,7 +3,7 @@
     "num_gangs_min": 1,
     "num_gangs_max": 4,
     "num_members_min": 2,
-    "num_members_max": 5,
+    "num_members_max": 2,
     "num_ranks": 4,
     "promotion_xp": 100,
     "p_death": 0.01,
@@ -40,8 +40,8 @@
     "arrest_time_max": 30
   },
   "sim_end": {
-    "gang_plans_thwarted": 2,
-    "gang_plans_succeed": 2,
-    "executed_agents": 5
+    "gang_plans_thwarted": 10,
+    "gang_plans_succeed": 10,
+    "executed_agents": 10
   }
 }

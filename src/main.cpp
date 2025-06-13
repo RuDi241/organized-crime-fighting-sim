@@ -6,9 +6,6 @@
 #include "VisualizationMSQ.h"
 
 int main() {
-  Config config;
-  config.load_from_file("Config.json");
-  Game game(config);
 
   // Create a message queue and set it here.
   VisualizationMSQ::msqid = msgget(IPC_PRIVATE, IPC_CREAT | 0666);
@@ -16,6 +13,10 @@ int main() {
     perror("Failed to create visulaization MSQ");
     exit(1);
   }
+
+  Config config;
+  config.load_from_file("Config.json");
+  Game game(config);
 
   pid_t pid = fork();
   if (pid < 0) {

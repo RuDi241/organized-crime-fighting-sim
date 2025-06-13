@@ -8,9 +8,11 @@
 class MemberGenerator {
 public:
   MemberGenerator() = delete;
-  MemberGenerator(const Config &config, int msq_id, int member_to_police_msq_id);
-  
-  static std::unique_ptr<GangMember> messageToMember(const GangMemberMessage &msg);
+  MemberGenerator(const Config &config, int msq_id,
+                  int member_to_police_msq_id);
+
+  static std::unique_ptr<GangMember>
+  messageToMember(const GangMemberMessage &msg, const int gangID);
   void run();
   GangMemberMessage generate();
 

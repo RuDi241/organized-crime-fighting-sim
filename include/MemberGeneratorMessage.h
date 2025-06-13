@@ -1,7 +1,7 @@
 #ifndef MEMBER_GENERATOR_MESSAGE_H
 #define MEMBER_GENERATOR_MESSAGE_H
 
-enum class GangMemberType : int {
+enum GangMemberType {
   GANG_MEMBER,
   SECRET_AGENT,
 };

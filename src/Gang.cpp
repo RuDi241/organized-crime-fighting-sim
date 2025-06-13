@@ -2,21 +2,22 @@
 #include "Config.h"
 #include <iostream>
 #include <sys/msg.h>
+#include "GangMember.h"
 #include "MemberGenerator.h"
 #include <SecretAgent.h>
 #include <NormalGangMember.h>
 #include "ArrestMessage.h"
 #include <csignal>
 #include <iostream>
+#include "MemberGeneratorMessage.h"
 #include "VisualizationMSQ.h"
 
 // Constructor
 Gang::Gang(const Config &config, int ID, int capacity, int acceptance_rate,
            int member_generator_msq_id, int target_generator_msq_id,
            int police_arrest_gang_msq_id)
-    : config(config), ID(ID), capacity(capacity),
-      acceptance_rate(acceptance_rate),
-      memberGeneratorMsqID(member_generator_msq_id),
+    : ID(ID), capacity(capacity), acceptance_rate(acceptance_rate),
+      config(config), memberGeneratorMsqID(member_generator_msq_id),
       targetGeneratorMsqID(target_generator_msq_id),
       policeArrestGangMsqID(police_arrest_gang_msq_id) {
   GangMembers.reserve(capacity); // Optional: optimize memory allocation
@@ -24,9 +25,9 @@ Gang::Gang(const Config &config, int ID, int capacity, int acceptance_rate,
   VisualizationMessage createGangVizMsg;
   createGangVizMsg.mtype = MessageType::ADD_GANG;
   createGangVizMsg.gangID = ID;
-  createGangVizMsg.memberIdx = -1; // No members yet
-  createGangVizMsg.leaks = 0;      // No leaks initially
-  createGangVizMsg.phase = 0;      // Initial phase
+  createGangVizMsg.memberIdx = -1;      // No members yet
+  createGangVizMsg.leaks = 0;           // No leaks initially
+  createGangVizMsg.phase = 0;           // Initial phase
   createGangVizMsg.capacity = capacity; // Set initial capacity
   VisualizationMSQ::send(createGangVizMsg);
 }
@@ -45,7 +46,7 @@ void Gang::acceptMember() {
   } else if (messageSize > 0) {
 
     // Directly push the unique_ptr returned by messageToMember
-    GangMembers.push_back(MemberGenerator::messageToMember(newMember));
+    GangMembers.push_back(MemberGenerator::messageToMember(newMember, getID()));
     std::cout << "New member accepted: ID = " << GangMembers.back()->getID()
               << ", Rank = " << GangMembers.back()->getRank() << std::endl;
     std::cout << "GangMember accepted. Total now: " << GangMembers.size()
@@ -189,12 +190,30 @@ void Gang::waitAllReady() {
   bool allReady = false;
   while (!allReady) {
     allReady = true;
-    for (const auto &member : GangMembers) {
-      if (!member->isReady()) {
+    for (size_t i = 0; i < size(GangMembers); i++) {
+
+      std::cout << "Gang size is = " << size(GangMembers) << std::endl;
+      VisualizationMessage vizMsg;
+      vizMsg.mtype = MessageType::UPDATE_MEMBER;
+      vizMsg.gangID = ID;
+      vizMsg.memberIdx = i; // Use member ID as index
+      vizMsg.leaks = -1;    // No leaks initially
+      vizMsg.phase = -1;    // Preparation phase
+      vizMsg.capacity = -1; // Current capacity of the gang
+
+      vizMsg.member.ID = GangMembers[i]->getID();
+      vizMsg.member.rank = GangMembers[i]->getRank();
+      vizMsg.member.trust = GangMembers[i]->getTrust();
+      vizMsg.member.preparation_counter = GangMembers[i]->getPreparation();
+      vizMsg.member.ready = GangMembers[i]->isReady();
+      vizMsg.member.type = static_cast<GangMemberType>(0);
+      VisualizationMSQ::send(vizMsg);
+      if (!GangMembers[i]->isReady()) {
         allReady = false;
         break;
       }
     }
+
     if (!allReady)
       sleep(1);
   }

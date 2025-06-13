@@ -8,8 +8,8 @@
 #include <iostream>
 class GangMember {
 public:
-  GangMember(int ID, int rank, int trust);
-  GangMember(const GangMemberMessage &msg);
+  GangMember(int ID, int rank, int trust, int gangID);
+  GangMember(const GangMemberMessage &msg, int gangID);
   GangMember() = delete; // Disable default constructor
   virtual ~GangMember(); // Destructor to clean up thread resources
 
@@ -20,14 +20,17 @@ public:
   void setRank(int rank);
   void prepare();
   bool isReady() const;
+  int getPreparation();
   virtual void receiveInformation(InformationMessage message) {
     // Base implementation does nothing - normal members just receive info
     // This is virtual so derived classes can override
-    std::cout << "GangMember received message with ID (should not print here): " << message.MessageID << std::endl;
+    std::cout << "GangMember received message with ID (should not print here): "
+              << message.MessageID << std::endl;
   }
 
 protected: // Changed from private to allow derived class access
   int ID;
+  int gangID;
   int rank;
   int trust;
   int preparation_counter = 0;

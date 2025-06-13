@@ -1,4 +1,5 @@
 #include "VisualizationMSQ.h"
+#include <iostream>
 #define GANG_COLOR 0.0f, 0.0f, 1.0f // Bright Blue for gang lines, inset
 #define STAR_COLOR 1.0f, 0.5f, 0.0f // Orange for secret agent star
 #define TEXT_COLOR                                                             \
@@ -301,17 +302,30 @@ void Graphics::drawMember(const MemberStruct &member, float x, float y,
 void Graphics::drawScene(double currentTime) {
   drawStatusBar(currentTime);
   for (size_t i = 1; i < gangs.size(); ++i) {
-    if (gangs[i].ID == 0)
-      continue; // Skip unused gangs
     drawGang(gangs[i], i, currentTime);
   }
 }
 
 void Graphics::Update() {
   VisualizationMessage msg;
-
   // Process all available messages in the queue
   while (VisualizationMSQ::try_receive(msg)) {
+    std::cout << VisualizationMSQ::msqid << std::endl;
+    std::cout << "Received message:\n";
+    std::cout << "  gangID: " << msg.gangID << "\n";
+    std::cout << "  memberIdx: " << msg.memberIdx << "\n";
+    std::cout << "  leaks: " << msg.leaks << "\n";
+    std::cout << "  phase: " << msg.phase << "\n";
+    std::cout << "  capacity: " << msg.capacity << "\n";
+    std::cout << "  member.ID: " << msg.member.ID << "\n";
+    std::cout << "  member.rank: " << msg.member.rank << "\n";
+    std::cout << "  member.trust: " << msg.member.trust << "\n";
+    std::cout << "  member.preparation_counter: "
+              << msg.member.preparation_counter << "\n";
+    std::cout << "  member.ready: " << (msg.member.ready ? "true" : "false")
+              << "\n";
+    std::cout << "  member.type: " << msg.member.type
+              << "\n"; // prints enum as int
     switch (static_cast<MessageType>(msg.mtype)) {
     case ADD_GANG: {
       // Don't add if gangID already exists
@@ -322,6 +336,8 @@ void Graphics::Update() {
       newGang.ID = msg.gangID;
       if (msg.leaks != -1)
         newGang.leaks = msg.leaks;
+      if (msg.capacity != -1)
+        newGang.capacity = msg.capacity;
       if (msg.phase != -1)
         newGang.phase = static_cast<GangPhase>(msg.phase);
       break;

@@ -7,8 +7,8 @@ struct MemberStruct {
   int ID;
   int rank;
   int trust;
-  int preparation_counter = 0;
-  bool ready = false;
+  int preparation_counter;
+  bool ready;
   GangMemberType type;
 };
 

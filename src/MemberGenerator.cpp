@@ -9,8 +9,10 @@
 #include <unistd.h>
 #include <iostream>
 #include <memory>
-MemberGenerator::MemberGenerator(const Config &config, int msq_id, int member_to_police_msq_id)
-    : config(config), msqID(msq_id), memberToPoliceMsqID(member_to_police_msq_id) {
+MemberGenerator::MemberGenerator(const Config &config, int msq_id,
+                                 int member_to_police_msq_id)
+    : config(config), msqID(msq_id),
+      memberToPoliceMsqID(member_to_police_msq_id) {
   srand(time(NULL));
 }
 
@@ -21,14 +23,18 @@ GangMemberMessage MemberGenerator::generate() {
       (rnd < config.agent.p_agent) ? GangMemberType::SECRET_AGENT
                                    : GangMemberType::GANG_MEMBER,
       memberToPoliceMsqID, // ID of the message queue for police communication
-      serialID++, config.gang.num_ranks, config.agent.initial_trust};
+      serialID++,
+      config.gang.num_ranks,
+      config.agent.initial_trust};
 }
 
-std::unique_ptr<GangMember> MemberGenerator::messageToMember(const GangMemberMessage &msg) {
+std::unique_ptr<GangMember>
+MemberGenerator::messageToMember(const GangMemberMessage &msg,
+                                 const int gangID) {
   if (msg.type == GangMemberType::SECRET_AGENT) {
-    return std::make_unique<SecretAgent>(msg, msg.memberToPoliceMsqID);
+    return std::make_unique<SecretAgent>(msg, msg.memberToPoliceMsqID, gangID);
   } else {
-    return std::make_unique<NormalGangMember>(msg);
+    return std::make_unique<NormalGangMember>(msg, gangID);
   }
 }
 void MemberGenerator::run() {
@@ -38,8 +44,8 @@ void MemberGenerator::run() {
     // Send the message to the message queue
     if (msgsnd(msqID, &message, sizeof(GangMemberMessage) - sizeof(long), 0) ==
         -1) {
-      //perror("msgsnd failed");
-      // handle error as appropriate (break, continue, or exit)
+      // perror("msgsnd failed");
+      //  handle error as appropriate (break, continue, or exit)
     }
 
     sleep(config.gang.member_generation_delay);

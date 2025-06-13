@@ -6,10 +6,10 @@
 
 class SecretAgent : public GangMember {
 public:
-  SecretAgent(int ID, int rank, int trust, int policeMsqID);
-  SecretAgent(const GangMemberMessage &msg, int policeMsqID);
+  SecretAgent(int ID, int rank, int trust, int policeMsqID, int gangID);
+  SecretAgent(const GangMemberMessage &msg, int policeMsqID, int gangID);
   SecretAgent() = delete;
-  
+
   void receiveInformation(InformationMessage message) override;
 
 private:
