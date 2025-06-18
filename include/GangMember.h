@@ -19,6 +19,7 @@ public:
   void setTrust(int newTrust);
   void setRank(int rank);
   void prepare();
+  void runPreparation();
   bool isReady() const;
   int getPreparation();
   virtual void receiveInformation(InformationMessage message) {
@@ -27,6 +28,7 @@ public:
     std::cout << "GangMember received message with ID (should not print here): "
               << message.MessageID << std::endl;
   }
+  static void* preparationThreadFunction(void* arg);
 
 protected: // Changed from private to allow derived class access
   int ID;
@@ -45,7 +47,6 @@ protected: // Changed from private to allow derived class access
 private:
   void startPreparationThread();
   void stopPreparationThread();
-  static void *preparationThreadFunction(void *arg);
   void runPreparationLoop();
 };
 

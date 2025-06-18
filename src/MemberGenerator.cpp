@@ -24,8 +24,8 @@ GangMemberMessage MemberGenerator::generate() {
                                    : GangMemberType::GANG_MEMBER,
       memberToPoliceMsqID, // ID of the message queue for police communication
       serialID++,
-      config.gang.num_ranks,
-      config.agent.initial_trust};
+      rand() % 2 + 1, // Random rank between 1 and 2
+      rand() % config.agent.initial_trust + config.agent.initial_trust/2}; // random trust around initial trust
 }
 
 std::unique_ptr<GangMember>

@@ -20,7 +20,6 @@ GangMember::GangMember(const GangMemberMessage &msg, int gangID)
 
 int GangMember::getPreparation() { return preparation_counter; }
 GangMember::~GangMember() {
-  stopPreparationThread();
   pthread_mutex_destroy(&counter_mutex);
   pthread_cond_destroy(&counter_cond);
 }
@@ -42,89 +41,32 @@ void GangMember::setRank(int newRank) { rank = newRank; }
 //     here): " << message.MessageID << std::endl;
 // }
 
+// Simple preparation function - just sets up the counter
 void GangMember::prepare() {
-  pthread_mutex_lock(&counter_mutex);
-
-  // Start thread if not already running
-  if (!thread_running) {
-    should_stop = false;
-    pthread_mutex_unlock(&counter_mutex); // Release lock before creating thread
-    startPreparationThread();
-    pthread_mutex_lock(&counter_mutex); // Re-acquire lock
-  }
-
-  preparation_counter = trust; // Set initial counter value based on trust
+  preparation_counter = trust;
   ready = false;
-  pthread_cond_signal(&counter_cond); // Wake up the preparation thread
-  pthread_mutex_unlock(&counter_mutex);
 }
 
-void GangMember::startPreparationThread() {
-  pthread_mutex_lock(&counter_mutex);
-  if (!thread_running) {
-    should_stop = false;
-    if (pthread_create(&preparation_thread, nullptr, preparationThreadFunction,
-                       this) == 0) {
-      thread_running = true;
-    }
+// The actual preparation work - this will be called from a thread in Gang
+void GangMember::runPreparation() {
+  std::cout << "Member " << ID << " starting preparation with counter: " << preparation_counter << std::endl;
+  
+  // Count down without any synchronization - each member has its own thread
+  while (preparation_counter > 0) {
+    usleep(1000000); // Sleep for 1 second
+    preparation_counter--;
+    std::cout << "Member " << ID << " preparation counter: " << preparation_counter << std::endl;
   }
-  pthread_mutex_unlock(&counter_mutex);
+  
+  ready = true;
+  std::cout << "Member " << ID << " is ready!" << std::endl;
 }
 
-// Stop the preparation thread
-void GangMember::stopPreparationThread() {
-  pthread_mutex_lock(&counter_mutex);
-  if (thread_running) {
-    should_stop = true;
-    pthread_cond_signal(&counter_cond); // Wake up thread so it can exit
-    pthread_mutex_unlock(&counter_mutex);
-
-    pthread_join(preparation_thread, nullptr); // Wait for thread to finish
-
-    pthread_mutex_lock(&counter_mutex);
-    thread_running = false;
-  }
-  pthread_mutex_unlock(&counter_mutex);
-}
-
-// Static thread function
-void *GangMember::preparationThreadFunction(void *arg) {
-  GangMember *member = static_cast<GangMember *>(arg);
-  member->runPreparationLoop();
+// Static thread function for Gang to use
+void* GangMember::preparationThreadFunction(void* arg) {
+  GangMember* member = static_cast<GangMember*>(arg);
+  member->runPreparation();
   return nullptr;
-}
-
-// The actual preparation loop running in the separate thread
-void GangMember::runPreparationLoop() {
-  pthread_mutex_lock(&counter_mutex);
-
-  while (!should_stop) {
-    while (preparation_counter <= 0 && !should_stop) {
-      pthread_cond_wait(&counter_cond, &counter_mutex);
-    }
-
-    if (should_stop)
-      break;
-    if (preparation_counter > 0) {
-      pthread_mutex_unlock(&counter_mutex);
-
-      usleep(100000);
-
-      pthread_mutex_lock(&counter_mutex);
-
-      preparation_counter--;
-
-      if (preparation_counter <= 0) {
-        ready = true;
-      }
-    } else {
-      pthread_mutex_unlock(&counter_mutex);
-      usleep(100000);
-      pthread_mutex_lock(&counter_mutex);
-    }
-  }
-
-  pthread_mutex_unlock(&counter_mutex);
 }
 
 bool GangMember::isReady() const { return ready; }

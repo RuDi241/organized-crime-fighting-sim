@@ -334,7 +334,7 @@ void Graphics::Update() {
       }
       GangStruct &newGang = gangs[msg.gangID];
       newGang.ID = msg.gangID;
-      if (msg.leaks != -1)
+      if (msg.leaks != INT_MIN)
         newGang.leaks = msg.leaks;
       if (msg.capacity != -1)
         newGang.capacity = msg.capacity;
@@ -354,7 +354,7 @@ void Graphics::Update() {
     case UPDATE_GANG: {
       if (msg.gangID >= 1 && msg.gangID < static_cast<int>(gangs.size())) {
         GangStruct &gang = gangs[msg.gangID];
-        if (msg.leaks != -1)
+        if (msg.leaks != INT_MIN)
           gang.leaks = msg.leaks;
         if (msg.phase != -1)
           gang.phase = static_cast<GangPhase>(msg.phase);

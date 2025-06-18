@@ -38,6 +38,7 @@ private:
   int memberGeneratorMsqID;
   int targetGeneratorMsqID;
   int policeArrestGangMsqID;
+  std::vector<pthread_t> preparation_threads;
 
   // Helper functions for gang process flow
   void prepareAll();

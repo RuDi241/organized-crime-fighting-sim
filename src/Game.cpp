@@ -45,17 +45,20 @@ void Game::run() {
   std::signal(SIGTERM, handle_sigterm);
 
   // fork gangs
-  int numberOfGangs =
-      random_int(config.gang.num_gangs_min, config.gang.num_gangs_max);
+  srand(time(NULL) ^ getpid()); 
+  int numberOfGangs = config.gang.num_gangs_min + rand() % (config.gang.num_gangs_max - config.gang.num_gangs_min + 1);
+
+
   for (int i = 0; i < numberOfGangs; ++i) {
     pid_t pid = fork();
     if (pid == 0) {
       // CHILD PROCESS
-      int capacity =
-          random_int(config.gang.num_members_min, config.gang.num_members_max);
+      srand(time(NULL) ^ getpid()); 
+      int capacity = config.gang.num_members_min + rand() % (config.gang.num_members_max - config.gang.num_members_min + 1);
+      std::cout <<  "minimum capacity: " << config.gang.num_members_min << std::endl;
+      std::cout <<  "maximum capacity: " << config.gang.num_members_max << std::endl;
       std::cout << "Capacity at GAME RUN: " << capacity << std::endl;
-      int acceptanceRate =
-          random_int(1, 100); // Acceptance rate between 1 and 100
+      int acceptanceRate = rand() % 100 + 1; // Acceptance rate between 1 and 100
       Gang gang(config, i + 1, capacity, acceptanceRate, memberGeneratorMsqID,
                 targetGeneratorMsqID, policeArrestGangMsqID);
       gang.run();
@@ -69,19 +72,11 @@ void Game::run() {
   }
 
   while (running) {
-    // ... main game loop ...
     sleep(1);
-    // cont++;
-    //  if (cont > 10) { // For testing purposes, run for 10 seconds
-    //    running = 0;
-    //  }
   }
 
   std::cout << "Game loop ended. Cleaning up..." << std::endl;
-  // for (pid_t pid : children) {
-  //   kill(pid, SIGKILL); // Send termination signal to all child processes
-  //   waitpid(pid, nullptr, 0);
-  // }
+
 }
 
 int Game::initMsq() {

@@ -1,13 +1,14 @@
 {
   "gang": {
-    "num_gangs_min": 1,
-    "num_gangs_max": 4,
+    "num_gangs_min": 5,
+    "num_gangs_max": 5,
     "num_members_min": 2,
-    "num_members_max": 2,
+    "num_members_max": 4,
     "num_ranks": 4,
     "promotion_xp": 100,
     "p_death": 0.01,
-    "execution_threshold": 50
+    "execution_threshold": 50,
+    "member_generation_delay": 3
   },
   "target": {
     "preparation_time_min": 10,
@@ -28,7 +29,7 @@
     "p_spread": 0.8
   },
   "agent": {
-    "initial_trust": 50,
+    "initial_trust": 10,
     "trust_decrement": 10,
     "inform_plans_threshold": 30,
     "p_agent": 0.5
